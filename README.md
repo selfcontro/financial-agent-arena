@@ -2,7 +2,7 @@
 
 当前已实现数据模块及本地存储服务：模拟数据、校验、评审保存修改、回答版本、审计、多次备份和指定恢复。现已接入题目与模型回答展示页面；人工评审表单已实现；评分统计、排行榜和权重设置已实现；报告生成、快照下载与复算校验已实现。
 
-## 运行本模块
+## 本地启动
 
 开发验证环境为 Node.js 22.22.1、npm 10.9.4。
 
@@ -40,7 +40,7 @@ npm run build
 
 内置题目、证据和模型回答均为模拟，不代表问财、豆包、千问、元宝的真实表现。正式人工评审初始为空。测试夹具中的评分只用于测试。
 
-当前 63 个测试覆盖评审保存恢复、修改及 GOAL.md 要求的汇总统计。已在浏览器验证回答保存、刷新恢复、版本历史及软删除；人工评分表单已在浏览器验证部分保存、完成校验和修改历史。完整 Agent 对话导出及最终人工评分尚未交付；程序生成的未评分四模型报告已保存于 reports/。
+当前 64 个测试覆盖评审保存恢复、修改及 GOAL.md 要求的汇总统计。已在浏览器验证回答保存、刷新恢复、版本历史及软删除；人工评分表单已在浏览器验证部分保存、完成校验和修改历史。已归档本地会话中可提取的用户与 Agent 对话正文；正式人工评分尚未录入；程序生成的未评分四模型报告已保存于 reports/。
 
 ## 可选模型 API
 
@@ -75,3 +75,31 @@ npm run report -- --verify reports/report.json
 默认读取内置数据，生成 `reports/report.md` 和 `reports/report.json`。传入数据集 JSON 可生成真实已保存人工评审的报告。验证命令重新计算数据摘要、统计和 Markdown，发现不一致时失败。重复生成到同一输出目录会覆盖该目录的两个报告文件，建议每次使用独立目录。
 
 仓库内 [四模型报告](reports/report.md) 包含 5 道题和 20 条模拟回答；内置人工评审为空，因此没有正式排名。它是未评分的程序生成报告，完成正式人工评审后应重新导出生成最终评分报告。报告计算版本与复现说明见 [第八模块](docs/report-module.md)。
+
+## 数据结构与已知限制
+
+| 集合 | 主要字段 |
+|---|---|
+| cases | case_id、version、question、reference_answer、reference_values 数组、allowed_evidence、cutoff_at、risk_labels |
+| models | model_id、display_name、enabled，以及可选 base_url、model_name |
+| answers | answer_id、version、case_id、case_version、model_id、answer、citations、generated_at、is_current |
+| reviews | review_id、case_id、model_id、answer_id、answer_version、dimension_scores 数组、failure_labels、comment、status、created_at、updated_at、完成时 reviewed_at |
+| scoring / scoring_history | 当前与历史维度配置、权重及版本 |
+| audit_events | 对象、动作、时间、修改前后快照 |
+
+完整字段和约束见 `src/services/validation.ts`。同一题目与模型只展示当前有效回答；修改回答创建新版本，新版重新评审。
+
+- 无账号或权限体系，本地使用者均可修改权重；没有服务端多人协作。
+- 数据保存在当前浏览器站点存储；切换浏览器或端口不会自动迁移。清理存储会丢失数据，需自行下载备份。
+- API 是可选扩展，只支持 OpenAI 兼容 Chat Completions；不保证供应商产品与此协议兼容。真实供应商调用未做验收，密钥重启服务后需重填。
+- 没有自动评分。仓库报告未填人工评分，正式排名需要人工完成评审后生成。
+- 浏览器实际下载落盘及文件选择器上传的完整往返尚未人工验收；自动测试已覆盖导出字节、导入、备份与恢复。
+
+## 交付索引
+
+- [最终交付检查](docs/delivery-checklist.md)
+- [Agent 对话记录](docs/conversations/conversation.md)（配套 JSON，范围和截止点见文件说明）
+- [实际验证记录](docs/final-validation.txt)
+- [四模型对比报告](reports/report.md)及 [可复算快照](reports/report.json)
+
+生产本地启动：`npm run build` 后执行 `npm start`。默认端口 5173；端口被占用时可使用 `ARENA_PORT=5186 npm start`。默认模拟流程启动后不需要模型密钥。

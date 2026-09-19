@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import {afterEach,it,expect,vi} from 'vitest';
 import {render,screen,fireEvent,cleanup,waitFor} from '@testing-library/react';
-import {DataManager} from '../src/components/DataManager.js';
+import {DataManager,downloadJson} from '../src/components/DataManager.js';
 import {EvaluationStore} from '../src/store/evaluationStore.js';
 import {Repository,BACKUP_PREFIX} from '../src/store/storage.js';
 import {createSeedDataset} from '../src/data/seed.js';
@@ -22,4 +22,19 @@ it('stops replacement when the backup write fails and retains import preview',as
   const store=setup(),original=store.getState();const native=Storage.prototype.setItem;
   vi.spyOn(Storage.prototype,'setItem').mockImplementation(function(this:Storage,k,v){if(k.startsWith(BACKUP_PREFIX))throw new Error('quota exceeded');native.call(this,k,v);});
   upload(JSON.stringify(createSeedDataset()));await screen.findByText('待导入：test.json');fireEvent.click(screen.getByRole('button',{name:'备份并确认完整替换'}));await screen.findByRole('alert');expect(store.getState()).toEqual(original);expect(screen.getByText('待导入：test.json')).toBeTruthy();
+});
+
+it('exports complete JSON bytes that can be imported without losing history',async()=>{
+  let downloaded:Blob|undefined;
+  vi.stubGlobal('URL',class extends URL {static createObjectURL(blob:Blob){downloaded=blob;return 'blob:test';}static revokeObjectURL(){}});
+  vi.spyOn(HTMLAnchorElement.prototype,'click').mockImplementation(()=>{});
+  try {
+    const source=new EvaluationStore(new Repository(localStorage));source.addModel({display_name:'export roundtrip'});
+    const expected=source.getState();downloadJson(expected,'dataset.json');
+    const text=await new Promise<string>((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(reader.error);reader.readAsText(downloaded!);});
+    expect(JSON.parse(text)).toEqual(expected);
+    await source.importDataset(JSON.parse(text));
+    expect(source.getState().models).toEqual(expected.models);expect(source.getState().audit_events.slice(0,-1)).toEqual(expected.audit_events);
+    expect((await source.listBackups()).backups).toHaveLength(1);
+  } finally {vi.unstubAllGlobals();}
 });

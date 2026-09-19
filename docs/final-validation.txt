@@ -1,0 +1,16 @@
+2026-09-19 最终交付验证（工具实际输出摘要）
+Node v22.22.1; npm 10.9.4
+npm ci: added 184 packages, audited 185 packages; found 0 vulnerabilities
+npm test: Test Files 9 passed (9); Tests 64 passed (64)
+npm run build: tsc --noEmit && vite build; 127 modules transformed; success
+npm run report -- --verify reports/report.json:
+报告复算一致：1416754ff24c80a2f484b6b16755c7259edbd945dfdb139b6a106b1e1df4df0e
+Production smoke test at http://127.0.0.1:5186:
+GET /: 200, title present
+GET /assets/index-DGhs5AiO.js: 200 text/javascript
+GET /assets/index-BzqTfb5Y.css: 200 text/css
+GET /api/connections/acceptance-missing: 200 {"configured":false}
+说明：首次 Python HTTP 请求走环境代理返回 502；禁用该本地请求的代理后以上检查通过，应用未作配置变更。
+会话正文归档：134 条，43 条用户、91 条助手。
+conversation.json SHA256: 47a5392fb784fee6aedf284f2f32cf165c4ed2b48224ae05963decc7df1d7c8f
+未验收项与范围见 delivery-checklist.md。
