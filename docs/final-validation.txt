@@ -14,3 +14,6 @@ GET /api/connections/acceptance-missing: 200 {"configured":false}
 会话正文归档：134 条，43 条用户、91 条助手。
 conversation.json SHA256: 47a5392fb784fee6aedf284f2f32cf165c4ed2b48224ae05963decc7df1d7c8f
 未验收项与范围见 delivery-checklist.md。
+
+补充验收：Chrome 下载 → 原生文件选择上传 → 导入 → 刷新 → 再导出 → 原数据恢复通过。
+归档及摘要：docs/acceptance/roundtrip-result.json；20 条评审草稿往返一致，正式完成 0。

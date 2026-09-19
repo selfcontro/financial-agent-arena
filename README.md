@@ -93,7 +93,7 @@ npm run report -- --verify reports/report.json
 - 数据保存在当前浏览器站点存储；切换浏览器或端口不会自动迁移。清理存储会丢失数据，需自行下载备份。
 - API 是可选扩展，只支持 OpenAI 兼容 Chat Completions；不保证供应商产品与此协议兼容。真实供应商调用未做验收，密钥重启服务后需重填。
 - 没有自动评分。仓库报告未填人工评分，正式排名需要人工完成评审后生成。
-- 浏览器实际下载落盘及文件选择器上传的完整往返尚未人工验收；自动测试已覆盖导出字节、导入、备份与恢复。
+- Chrome 已完成实际下载、原生文件选择器上传、导入、刷新、再次导出与恢复验收。内置浏览器的下载完成事件未确认，建议用 Chrome 下载。详见 docs/acceptance/browser-roundtrip.md。
 
 ## 交付索引
 
@@ -103,3 +103,7 @@ npm run report -- --verify reports/report.json
 - [四模型对比报告](reports/report.md)及 [可复算快照](reports/report.json)
 
 生产本地启动：`npm run build` 后执行 `npm start`。默认端口 5173；端口被占用时可使用 `ARENA_PORT=5186 npm start`。默认模拟流程启动后不需要模型密钥。
+
+## 待人工确认的评分草稿
+
+[20 条建议评分与理由](reviews/scoring-proposal.md)基于内置模拟证据，由 Codex 拟定，尚未经人工确认。配套 `reviews/proposed-dataset.json` 全部为评审中，不进入正式排行榜。请审核后再确认或修改为正式评分；默认种子数据与报告保持未评分。

@@ -1,0 +1,25 @@
+{
+  "browser": "Google Chrome",
+  "origin": "http://127.0.0.1:5173/",
+  "upload_method": "macOS native file picker; extension upload permission not changed",
+  "before_file": "arena-1789829143682.json",
+  "after_file": "arena-1789829180116.json",
+  "before_sha256": "0645da07269ca941b14f20cd58918773cafe209a2608f5b5f808ba0b1b98c5c7",
+  "after_sha256": "bddf52b8e63677e00647c2b73f48ae0eb2cde33cf587cbea8159c13c70c7afff",
+  "equal_collections": [
+    "models",
+    "cases",
+    "answers",
+    "reviews",
+    "scoring",
+    "scoring_history"
+  ],
+  "expected_changed_fields": [
+    "updated_at",
+    "audit_events"
+  ],
+  "audit_prefix_preserved": true,
+  "new_event": "import",
+  "review_count": 20,
+  "formal_completed": 0
+}
