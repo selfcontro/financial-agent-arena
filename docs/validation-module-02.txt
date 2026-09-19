@@ -1,0 +1,17 @@
+
+> financial-agent-arena@0.1.0 test
+> vitest run
+
+
+ RUN  v5.0.1 /Users/wly/Desktop/项目1/同花顺笔试
+
+
+ Test Files  2 passed (2)
+      Tests  25 passed (25)
+   Start at  21:58:51
+   Duration  193ms (transform 35%, tests 33%, import 30%, worker 2%)
+
+
+> financial-agent-arena@0.1.0 typecheck
+> tsc --noEmit
+
