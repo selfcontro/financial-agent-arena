@@ -91,6 +91,8 @@ export class EvaluationStore {
     this.ensureIdle(); this.busy=true;
     try {return await this.repository.createBackup(this.getState(),reason,this.now(),this.id());} finally {this.busy=false;}
   }
+  rawCurrent() {return this.repository.rawCurrent();}
+  readBackup(id:string) {return this.repository.readBackup(id);}
   listBackups() {return this.repository.listBackups();}
   async importDataset(input:unknown) {await this.replace(validateDataset(input),'import');}
   async restoreBackup(backupId:string) {
