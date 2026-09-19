@@ -3,7 +3,7 @@ import { validateDataset } from '../services/validation.js';
 import { Repository } from './storage.js';
 
 type ReviewInput=Pick<ReviewRecord,'answer_id'|'answer_version'|'dimension_scores'|'failure_labels'|'comment'|'status'>;
-type AnswerEdit=Pick<ModelAnswer,'answer'|'citations'|'generated_at'>;
+type AnswerEdit=Pick<ModelAnswer,'answer'|'citations'|'generated_at'> & Partial<Pick<ModelAnswer,'simulated'|'connection_snapshot'>>;
 type Event=EvaluationDataset['audit_events'][number];
 export class EvaluationStore {
   private state:EvaluationDataset;
@@ -21,6 +21,12 @@ export class EvaluationStore {
     next.models.push(model);next.audit_events.push(this.event('model',model.model_id,'create',undefined,model));this.commit(next);
     return model.model_id;
   }
+  updateModel(modelId:string, input:Pick<Model,'display_name'|'base_url'|'model_name'>) {
+    this.ensureIdle();const next=this.getState();const model=next.models.find(m=>m.model_id===modelId);
+    if(!model) throw new Error('模型不存在');const before=structuredClone(model);
+    Object.assign(model,structuredClone(input));
+    next.audit_events.push(this.event('model',modelId,'update',before,model));this.commit(next);
+  }
   addAnswer(caseId:string,modelId:string,edit:AnswerEdit) {
     this.ensureIdle(); const next=this.getState();
     if(!next.models.some(m=>m.model_id===modelId&&m.enabled)) throw new Error('模型不存在或已停用');
@@ -28,7 +34,7 @@ export class EvaluationStore {
     if(!question) throw new Error('题目不存在');
     if(next.answers.some(a=>a.case_id===caseId&&a.model_id===modelId&&a.is_current&&!a.deleted_at)) throw new Error('该模型已有当前回答，请编辑原回答');
     const previous=next.answers.filter(a=>a.case_id===caseId&&a.model_id===modelId).sort((a,b)=>b.version-a.version)[0];
-    const answer:ModelAnswer={...structuredClone(edit),answer_id:previous?.answer_id??this.id(),version:previous?previous.version+1:1,case_id:caseId,case_version:question.version,model_id:modelId,is_current:true,simulated:true};
+    const answer:ModelAnswer={...structuredClone(edit),answer_id:previous?.answer_id??this.id(),version:previous?previous.version+1:1,case_id:caseId,case_version:question.version,model_id:modelId,is_current:true,simulated:edit.simulated??true};
     next.answers.push(answer);next.audit_events.push(this.event('answer',answer.answer_id,'create',undefined,answer));this.commit(next);
   }
   deleteAnswer(answerId:string) {
@@ -66,7 +72,7 @@ export class EvaluationStore {
     this.ensureIdle(); const next=this.getState();
     const old=next.answers.find(a=>a.answer_id===answerId&&a.is_current&&!a.deleted_at);
     if(!old) throw new Error('当前回答不存在');
-    if(['answer','citations','generated_at'].every(k=>JSON.stringify(old[k as keyof ModelAnswer])===JSON.stringify(edit[k as keyof AnswerEdit]))) return;
+    if(['answer','citations','generated_at','simulated','connection_snapshot'].every(k=>edit[k as keyof AnswerEdit]===undefined || JSON.stringify(old[k as keyof ModelAnswer])===JSON.stringify(edit[k as keyof AnswerEdit]))) return;
     const before=structuredClone(old); old.is_current=false;
     const revised={...before,...structuredClone(edit),version:Math.max(...next.answers.filter(a=>a.answer_id===answerId).map(a=>a.version))+1};
     next.answers.push(revised);

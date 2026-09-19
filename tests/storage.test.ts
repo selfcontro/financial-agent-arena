@@ -19,6 +19,13 @@ function review(s:EvaluationStore) {
 }
 
 describe('local persistence and audit history',()=>{
+  it('preserves the API provenance and starts a new review version',()=>{
+    const disk=new MemoryStorage(),s=store(disk);s.saveReview(review(s));const old=s.getState().answers[0];
+    s.editAnswer(old.answer_id,{answer:'API generated answer',citations:[],generated_at:old.generated_at,simulated:false,connection_snapshot:{base_url:'https://provider.example/v1',model_name:'model-a'}});
+    const restored=store(disk).getState();const current=restored.answers.find(a=>a.answer_id===old.answer_id&&a.is_current)!;
+    expect(current).toMatchObject({version:2,simulated:false,connection_snapshot:{model_name:'model-a'}});
+    expect(restored.reviews[0].answer_version).toBe(1);
+  });
   it('adds a model and answer, persists both and rejects duplicate answers',()=>{
     const disk=new MemoryStorage(),s=store(disk);
     const modelId=s.addModel({display_name:'新增模型'});

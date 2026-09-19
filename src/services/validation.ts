@@ -16,7 +16,7 @@ export const caseSchema = z.object({
   allowed_evidence: z.array(evidenceSchema).min(1), cutoff_at: timestamp, risk_labels: z.array(z.enum(failureLabels)), simulated: z.literal(true),
 }).strict();
 export const citationSchema = z.object({ citation_id: id, evidence_id: id.optional(), source_name: id, title: id, published_at: timestamp, excerpt: z.string() }).strict();
-export const answerSchema = z.object({ answer_id: id, version, case_id: id, case_version: version, model_id: id, answer: id, citations: z.array(citationSchema), generated_at: timestamp, is_current: z.boolean(), deleted_at: timestamp.optional(), simulated: z.literal(true) }).strict();
+export const answerSchema = z.object({ answer_id: id, version, case_id: id, case_version: version, model_id: id, answer: id, citations: z.array(citationSchema), generated_at: timestamp, is_current: z.boolean(), deleted_at: timestamp.optional(), simulated: z.boolean(), connection_snapshot: z.object({ base_url: z.url(), model_name: id }).strict().optional() }).strict();
 export const reviewSchema = z.object({
   review_id: id, case_id: id, model_id: id, answer_id: id, answer_version: version, scoring_version: version,
   dimension_scores: z.array(z.object({ dimension_id: id, score: z.number().int().min(0).max(10), label_snapshot: z.string().optional() }).strict()),
