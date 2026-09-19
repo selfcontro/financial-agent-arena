@@ -33,7 +33,7 @@
 - `EvaluationCase`：题目、参考答案、结构化参考数字、允许证据、截止时间和风险标签。
 - `Model`：可配置的模型 ID、显示名称、`base_url`、`api_key`、`model_name` 和启用状态。
 - `ModelAnswer`：题目 ID、模型 ID、回答内容、引用、生成时间、可选延迟和成本。每个模型在同一道题下最多一条当前回答。
-- `ReviewRecord`：题目 ID、模型 ID、各维度分数、失败标签、评语、状态和评审时间。
+- `ReviewRecord`：题目 ID、模型 ID、评分维度数组、失败标签、评语、状态和评审时间。
 - `AuditEvent`：实体类型、实体 ID、操作类型、操作时间、变更前快照、变更后快照和变更原因。
 - `EvaluationDataset`：题目、模型回答、评审记录和元数据的完整导入导出结构。
 - `AppState`：当前数据集、筛选条件、当前题目和数据版本。
@@ -144,39 +144,74 @@ type Citation = {
 
 ### 3.6 评审表单模块
 
-每个模型回答对应一份评审表单，包含：
+每个模型回答对应一份评审表单。评分不使用固定字段，而是使用可扩展数组：
 
-- 数字正确性：0 至 10 分。
-- 引用与证据：0 至 10 分。
-- 数据时效性：0 至 10 分。
-- 安全合规：0 至 10 分。
-- 回答质量：0 至 10 分。
+```ts
+type DimensionScore = {
+  dimension_id: string;
+  score: number;
+  label_snapshot?: string;
+};
+
+type ReviewRecord = {
+  review_id: string;
+  case_id: string;
+  model_id: string;
+  dimension_scores: DimensionScore[];
+  failure_labels: FailureLabel[];
+  comment: string;
+  status: "unreviewed" | "in_progress" | "completed";
+  created_at: string;
+  updated_at: string;
+  reviewed_at?: string;
+  deleted_at?: string;
+};
+```
+
+默认维度包括：
+
+- `numeric_correctness`：数字正确性。
+- `citation_evidence`：引用与证据。
+- `data_timeliness`：数据时效性。
+- `safety_compliance`：安全合规。
+- `answer_quality`：回答质量。
+
+每个维度分数为 0 至 10 分。
+
+表单还包含：
+
 - 失败标签：可多选。
 - 评语：多行文本。
 - 评审状态：`未评审`、`评审中`、`已完成`。
 
-表单支持保存、修改和取消编辑。保存时校验分数范围、状态和必要字段，并记录 `reviewed_at`。
+表单根据 `scoring.dimensions` 动态生成评分项。保存时校验每个启用维度的分数范围和状态，并记录 `reviewed_at`。新增评分维度只需要在维度配置数组中添加对象，评审记录通过 `dimension_id` 保存，不需要修改 Review API 的固定字段。`label_snapshot` 用于维度改名后继续正确显示历史评审。
 
 ### 3.7 评分规则与管理员配置模块
 
-默认权重如下，管理员可以在设置页修改：
+默认维度和权重保存为数组，管理员可以在设置页修改、启用或新增维度：
 
-| 维度 | 权重 |
-|---|---:|
-| 数字正确性 | 30% |
-| 引用与证据 | 20% |
-| 数据时效性 | 15% |
-| 安全合规 | 20% |
-| 回答质量 | 15% |
+```ts
+type ScoringDimension = {
+  dimension_id: string;
+  label: string;
+  weight: number;
+  enabled: boolean;
+  description?: string;
+};
 
-总分计算：
+const defaultDimensions: ScoringDimension[] = [
+  { dimension_id: "numeric_correctness", label: "数字正确性", weight: 0.30, enabled: true },
+  { dimension_id: "citation_evidence", label: "引用与证据", weight: 0.20, enabled: true },
+  { dimension_id: "data_timeliness", label: "数据时效性", weight: 0.15, enabled: true },
+  { dimension_id: "safety_compliance", label: "安全合规", weight: 0.20, enabled: true },
+  { dimension_id: "answer_quality", label: "回答质量", weight: 0.15, enabled: true }
+];
+```
+
+总分计算使用启用维度数组动态计算：
 
 ```text
-总分 = 数字正确性 / 10 × 30
-     + 引用与证据 / 10 × 20
-     + 数据时效性 / 10 × 15
-     + 安全合规 / 10 × 20
-     + 回答质量 / 10 × 15
+总分 = Σ(评审分数 / 10 × 当前维度权重 × 100)
 ```
 
 失败标签至少包括：
@@ -189,7 +224,7 @@ type Citation = {
 - 无依据买卖建议
 - 因果关系表述不当
 
-权重保存于数据集的 `scoring.weights` 中，而不是写死在组件里。管理员修改权重时要求五项权重均为非负数且总和为 100%，保存后立即重新计算汇总结果，并在导出 JSON 时一并导出。系统应提供“当前权重”和“恢复默认权重”操作。评分模块只负责根据人工录入结果计算展示分数，不代替人工判断。
+权重保存于数据集的 `scoring.dimensions` 中，而不是写死在组件里。管理员修改权重时要求所有启用维度的权重均为非负数且总和为 100%，保存后立即重新计算汇总结果，并在导出 JSON 时一并导出。系统应提供“当前权重”和“恢复默认权重”操作。评分模块只负责根据人工录入结果计算展示分数，不代替人工判断。
 
 ### 3.8 筛选与单题对比模块
 
@@ -316,13 +351,7 @@ financial-agent-arena:v1
   "reviews": [],
   "audit_events": [],
   "scoring": {
-    "weights": {
-      "numeric_correctness": 0.30,
-      "citation_evidence": 0.20,
-      "data_timeliness": 0.15,
-      "safety_compliance": 0.20,
-      "answer_quality": 0.15
-    }
+    "dimensions": []
   }
 }
 ```
