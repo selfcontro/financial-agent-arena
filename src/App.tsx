@@ -3,6 +3,8 @@ import { EvaluationStore } from './store/evaluationStore.js';
 import { Repository } from './store/storage.js';
 import { Modal } from './components/Modal.js';
 import { ReviewForm, ReviewSummary } from './components/ReviewForm.js';
+import { ReviewExplorer } from './components/ReviewExplorer.js';
+import { emptyFilters,type ReviewFilters } from './services/filtering.js';
 import { SummaryReport } from './components/SummaryReport.js';
 import { reviewReadiness } from './services/review.js';
 import { modelApi } from './services/modelApi.js';
@@ -17,7 +19,8 @@ export function App() {
   const [data,setData]=useState(()=>store.getState());
   const [selected,setSelected]=useState(data.cases[0].case_id);
   const [notice,setNotice]=useState('');
-  const [view,setView]=useState<'cases'|'summary'>('cases');
+  const [view,setView]=useState<'cases'|'summary'|'filters'>('cases');
+  const [filters,setFilters]=useState<ReviewFilters>({...emptyFilters});
   const [editor,setEditor]=useState<{modelId:string;answer?:ModelAnswer}|null>(null);
   const [deleting,setDeleting]=useState<ModelAnswer|null>(null);
   const [history,setHistory]=useState<string|null>(null);
@@ -34,12 +37,13 @@ export function App() {
   return <div className="layout">
     <aside className="sidebar"><a className="brand" href="#"><span className="brand-icon">评</span><span>金融 Agent<span className="brand-sub">EVALUATION ARENA</span></span></a>
       <button className={`case-nav ${view==='summary'?'selected':''}`} onClick={()=>setView('summary')}>▥ 评测汇总与排行榜</button>
+      <button className={`case-nav ${view==='filters'?'selected':''}`} onClick={()=>setView('filters')}>⌕ 分级筛选</button>
       <div className="section-label">评测工作台 <span>{cases.length.toString().padStart(2,'0')}</span></div>
       <nav aria-label="评测题目">{cases.map((c,i)=><button key={c.case_id} className={`case-nav ${view==='cases'&&c.case_id===question.case_id?'selected':''}`} onClick={()=>{setSelected(c.case_id);setView('cases');setNotice('');}} aria-current={view==='cases'&&c.case_id===question.case_id?'page':undefined}><span className="case-number">{String(i+1).padStart(2,'0')}</span><span><strong>{headings[i]??c.case_id}</strong><small>{c.case_id}</small></span></button>)}</nav>
       <div className="sidebar-note"><span className="dot"/> 本地模拟数据集<p>内置回答为模拟样本，<br/>API 生成回答单独标识。</p></div>
     </aside>
-    <main><header className="topbar"><span>工作台 <span className="slash">/</span> {view==='summary'?'评测汇总':'单题对比'}</span><span className="local-badge">本地保存 · 可选 API 调用</span></header>
-      <div className="workspace">{view==='summary'?<SummaryReport data={data} readOnly={!!store.warning} openCase={id=>{setSelected(id);setView('cases');}} saveRules={dims=>store.updateScoring(dims)}/>:<><div className="page-heading"><div><div className="eyebrow">COMPARE & REVIEW</div><h1>让每个回答，都有据可查。</h1><p>对照参考证据，比较不同模型在同一问题上的回答。</p></div><button className="primary" onClick={()=>setAddingModel(true)} disabled={!!store.warning}>＋ 添加模型</button></div>
+    <main><header className="topbar"><span>工作台 <span className="slash">/</span> {view==='summary'?'评测汇总':view==='filters'?'分级筛选':'单题对比'}</span><span className="local-badge">本地保存 · 可选 API 调用</span></header>
+      <div className="workspace">{view==='filters'?<ReviewExplorer data={data} filters={filters} change={setFilters} openCase={id=>{setSelected(id);setView('cases');}}/>:view==='summary'?<SummaryReport data={data} readOnly={!!store.warning} openCase={id=>{setSelected(id);setView('cases');}} saveRules={dims=>store.updateScoring(dims)}/>:<><div className="page-heading"><div><div className="eyebrow">COMPARE & REVIEW</div><h1>让每个回答，都有据可查。</h1><p>对照参考证据，比较不同模型在同一问题上的回答。</p></div><button className="primary" onClick={()=>setAddingModel(true)} disabled={!!store.warning}>＋ 添加模型</button></div>
       {store.warning&&<p role="alert" className="warning">{store.warning}</p>}{notice&&<p role="status" className={notice.startsWith('操作失败')?'warning':'notice'}>{notice}</p>}
       <section className="question-panel"><div className="question-meta"><span className="pill">评测题 {question.case_id}</span><span>截止时间 · {stamp(question.cutoff_at)}（北京时间）</span></div><h2>{question.question}</h2><div className="tags">{question.risk_labels.map(l=><span key={l}>{l}</span>)}</div>
         <details><summary>参考答案与证据 <span>展开核对 ↓</span></summary><p className="reference-answer">{question.reference_answer}</p><div className="reference-values">{question.reference_values.map(v=><div key={v.key}><small>{v.label}</small><strong>{v.value} <em>{v.unit}</em></strong><small>{v.period}</small></div>)}</div>
