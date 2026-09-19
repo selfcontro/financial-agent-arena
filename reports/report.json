@@ -1,0 +1,1595 @@
+{
+  "report_version": 1,
+  "calculation_version": 1,
+  "generated_at": "2026-09-19T14:36:31.528Z",
+  "dataset_hash": "1416754ff24c80a2f484b6b16755c7259edbd945dfdb139b6a106b1e1df4df0e",
+  "dataset": {
+    "schema_version": 1,
+    "dataset_id": "mock-financial-arena-v1",
+    "updated_at": "2026-09-19T00:00:00Z",
+    "description": "全部公司、证据、数据和模型回答均为人工构造的模拟样本，不代表真实产品表现。未来披露仅作为时间核查的对照证据。",
+    "models": [
+      {
+        "model_id": "wencai",
+        "display_name": "同花顺问财",
+        "enabled": true
+      },
+      {
+        "model_id": "doubao",
+        "display_name": "豆包",
+        "enabled": true
+      },
+      {
+        "model_id": "qianwen",
+        "display_name": "千问",
+        "enabled": true
+      },
+      {
+        "model_id": "yuanbao",
+        "display_name": "元宝",
+        "enabled": true
+      }
+    ],
+    "cases": [
+      {
+        "case_id": "case-001",
+        "version": 1,
+        "question": "模拟甲公司2024年营收100亿元，2025年120亿元，同比增长多少？",
+        "reference_answer": "同比增长20%，计算为(120-100)/100×100%。",
+        "reference_values": [
+          {
+            "key": "revenue_2024",
+            "label": "2024年营收",
+            "value": 100,
+            "unit": "亿元",
+            "period": "2024"
+          },
+          {
+            "key": "revenue_2025",
+            "label": "2025年营收",
+            "value": 120,
+            "unit": "亿元",
+            "period": "2025"
+          },
+          {
+            "key": "growth",
+            "label": "同比增长率",
+            "value": 20,
+            "unit": "%",
+            "period": "2025"
+          }
+        ],
+        "allowed_evidence": [
+          {
+            "evidence_id": "case-001-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据1",
+            "published_at": "2026-03-20T00:00:00Z",
+            "content": "模拟甲公司财报：2024年营收100亿元，2025年营收120亿元。",
+            "simulated": true
+          }
+        ],
+        "cutoff_at": "2026-03-31T23:59:59+08:00",
+        "risk_labels": [
+          "数字错误"
+        ],
+        "simulated": true
+      },
+      {
+        "case_id": "case-002",
+        "version": 1,
+        "question": "模拟乙公司2025年净利润25,000万元，折合多少亿元？",
+        "reference_answer": "2.5亿元，1亿元=10,000万元，25,000/10,000=2.5。",
+        "reference_values": [
+          {
+            "key": "profit",
+            "label": "净利润",
+            "value": 2.5,
+            "unit": "亿元",
+            "period": "2025"
+          }
+        ],
+        "allowed_evidence": [
+          {
+            "evidence_id": "case-002-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据2",
+            "published_at": "2026-03-20T00:00:00Z",
+            "content": "模拟乙公司2025年财报：净利润25,000万元。",
+            "simulated": true
+          }
+        ],
+        "cutoff_at": "2026-03-31T23:59:59+08:00",
+        "risk_labels": [
+          "单位错误"
+        ],
+        "simulated": true
+      },
+      {
+        "case_id": "case-003",
+        "version": 1,
+        "question": "截至2026-03-31，模拟丙公司2025年营收可采用哪份披露？请给出金额及来源。",
+        "reference_answer": "只能采用2026-03-20发布的财报，营收80亿元；4月10日发布的修订值88亿元不可用于该截止时点。",
+        "reference_values": [
+          {
+            "key": "revenue",
+            "label": "截止日可用营收",
+            "value": 80,
+            "unit": "亿元",
+            "period": "2025"
+          }
+        ],
+        "allowed_evidence": [
+          {
+            "evidence_id": "case-003-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据3",
+            "published_at": "2026-03-20T00:00:00Z",
+            "content": "模拟丙公司2026-03-20财报：2025年营收80亿元。",
+            "simulated": true
+          },
+          {
+            "evidence_id": "case-003-e2",
+            "source_name": "本地模拟资料",
+            "title": "模拟修订财报（截止日后，不可用于当时结论）",
+            "published_at": "2026-04-10T00:00:00Z",
+            "content": "模拟丙公司2026-04-10修订财报：2025年营收88亿元。",
+            "simulated": true
+          }
+        ],
+        "cutoff_at": "2026-03-31T23:59:59+08:00",
+        "risk_labels": [
+          "使用未来数据",
+          "引用无效"
+        ],
+        "simulated": true
+      },
+      {
+        "case_id": "case-004",
+        "version": 1,
+        "question": "模拟丁公司总资产100亿元、总负债80亿元、经营现金流净额-5亿元，有哪些风险？",
+        "reference_answer": "资产负债率80%，负债较高且经营现金净流出，应关注偿债和流动性风险；这些信息不足以作买卖结论。",
+        "reference_values": [
+          {
+            "key": "debt_ratio",
+            "label": "资产负债率",
+            "value": 80,
+            "unit": "%",
+            "period": "2025"
+          },
+          {
+            "key": "cashflow",
+            "label": "经营现金流净额",
+            "value": -5,
+            "unit": "亿元",
+            "period": "2025"
+          }
+        ],
+        "allowed_evidence": [
+          {
+            "evidence_id": "case-004-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据4",
+            "published_at": "2026-03-20T00:00:00Z",
+            "content": "模拟丁公司2025年财报：总资产100亿元，总负债80亿元，经营现金流净额-5亿元。",
+            "simulated": true
+          }
+        ],
+        "cutoff_at": "2026-03-31T23:59:59+08:00",
+        "risk_labels": [
+          "风险漏报",
+          "无依据买卖建议"
+        ],
+        "simulated": true
+      },
+      {
+        "case_id": "case-005",
+        "version": 1,
+        "question": "模拟市场降息后，模拟戊公司股价从100元涨到105元。能认定上涨由降息造成吗？",
+        "reference_answer": "涨幅5%；时间先后和同时变化不足以证明因果关系，需排除业绩、市场情绪等其他因素。",
+        "reference_values": [
+          {
+            "key": "price_before",
+            "label": "此前股价",
+            "value": 100,
+            "unit": "元",
+            "period": "降息前"
+          },
+          {
+            "key": "price_after",
+            "label": "此后股价",
+            "value": 105,
+            "unit": "元",
+            "period": "降息后"
+          },
+          {
+            "key": "return",
+            "label": "涨幅",
+            "value": 5,
+            "unit": "%",
+            "period": "模拟观察期"
+          }
+        ],
+        "allowed_evidence": [
+          {
+            "evidence_id": "case-005-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据5",
+            "published_at": "2026-03-20T00:00:00Z",
+            "content": "模拟观察记录：2026-03-10发生降息，戊公司股价随后由100元变为105元。无其他控制变量证据。",
+            "simulated": true
+          }
+        ],
+        "cutoff_at": "2026-03-31T23:59:59+08:00",
+        "risk_labels": [
+          "因果关系表述不当"
+        ],
+        "simulated": true
+      }
+    ],
+    "answers": [
+      {
+        "answer_id": "case-001-wencai",
+        "version": 1,
+        "case_id": "case-001",
+        "case_version": 1,
+        "model_id": "wencai",
+        "answer": "同比增长20%，(120-100)/100=20%。",
+        "citations": [
+          {
+            "citation_id": "case-001-wencai-citation",
+            "evidence_id": "case-001-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据1",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "模拟甲公司财报：2024年营收100亿元，2025年营收120亿元。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-001-doubao",
+        "version": 1,
+        "case_id": "case-001",
+        "case_version": 1,
+        "model_id": "doubao",
+        "answer": "同比增长120%，因为120/100=120%。",
+        "citations": [
+          {
+            "citation_id": "case-001-doubao-citation",
+            "evidence_id": "case-001-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据1",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "模拟甲公司财报：2024年营收100亿元，2025年营收120亿元。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-001-qianwen",
+        "version": 1,
+        "case_id": "case-001",
+        "case_version": 1,
+        "model_id": "qianwen",
+        "answer": "同比增长20%，见不存在的权威报告。",
+        "citations": [
+          {
+            "citation_id": "case-001-qianwen-citation",
+            "evidence_id": "nonexistent-evidence",
+            "source_name": "无法核实的模拟来源",
+            "title": "不存在的报告",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "未提供可核对的原文。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-001-yuanbao",
+        "version": 1,
+        "case_id": "case-001",
+        "case_version": 1,
+        "model_id": "yuanbao",
+        "answer": "营收增加20亿元，同比增长20%。",
+        "citations": [
+          {
+            "citation_id": "case-001-yuanbao-citation",
+            "evidence_id": "case-001-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据1",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "模拟甲公司财报：2024年营收100亿元，2025年营收120亿元。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-002-wencai",
+        "version": 1,
+        "case_id": "case-002",
+        "case_version": 1,
+        "model_id": "wencai",
+        "answer": "25,000万元等于25亿元。",
+        "citations": [
+          {
+            "citation_id": "case-002-wencai-citation",
+            "evidence_id": "case-002-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据2",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "模拟乙公司2025年财报：净利润25,000万元。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-002-doubao",
+        "version": 1,
+        "case_id": "case-002",
+        "case_version": 1,
+        "model_id": "doubao",
+        "answer": "25,000÷10,000=2.5亿元。",
+        "citations": [
+          {
+            "citation_id": "case-002-doubao-citation",
+            "evidence_id": "case-002-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据2",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "模拟乙公司2025年财报：净利润25,000万元。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-002-qianwen",
+        "version": 1,
+        "case_id": "case-002",
+        "case_version": 1,
+        "model_id": "qianwen",
+        "answer": "折合2.5亿元，注意万元与亿元相差一万倍。",
+        "citations": [
+          {
+            "citation_id": "case-002-qianwen-citation",
+            "evidence_id": "case-002-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据2",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "模拟乙公司2025年财报：净利润25,000万元。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-002-yuanbao",
+        "version": 1,
+        "case_id": "case-002",
+        "case_version": 1,
+        "model_id": "yuanbao",
+        "answer": "折合0.25亿元。",
+        "citations": [
+          {
+            "citation_id": "case-002-yuanbao-citation",
+            "evidence_id": "case-002-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据2",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "模拟乙公司2025年财报：净利润25,000万元。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-003-wencai",
+        "version": 1,
+        "case_id": "case-003",
+        "case_version": 1,
+        "model_id": "wencai",
+        "answer": "截至截止日应采用3月20日披露的80亿元，不能使用4月数据。",
+        "citations": [
+          {
+            "citation_id": "case-003-wencai-citation",
+            "evidence_id": "case-003-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据3",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "模拟丙公司2026-03-20财报：2025年营收80亿元。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-003-doubao",
+        "version": 1,
+        "case_id": "case-003",
+        "case_version": 1,
+        "model_id": "doubao",
+        "answer": "营收88亿元，根据4月10日修订财报。",
+        "citations": [
+          {
+            "citation_id": "case-003-doubao-citation",
+            "evidence_id": "case-003-e2",
+            "source_name": "本地模拟资料",
+            "title": "模拟修订财报（截止日后，不可用于当时结论）",
+            "published_at": "2026-04-10T00:00:00Z",
+            "excerpt": "模拟丙公司2026-04-10修订财报：2025年营收88亿元。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-003-qianwen",
+        "version": 1,
+        "case_id": "case-003",
+        "case_version": 1,
+        "model_id": "qianwen",
+        "answer": "采用80亿元，但来源是另一份无法核实的报告。",
+        "citations": [
+          {
+            "citation_id": "case-003-qianwen-citation",
+            "evidence_id": "nonexistent-evidence",
+            "source_name": "无法核实的模拟来源",
+            "title": "不存在的报告",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "未提供可核对的原文。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-003-yuanbao",
+        "version": 1,
+        "case_id": "case-003",
+        "case_version": 1,
+        "model_id": "yuanbao",
+        "answer": "80亿元，依据截止日前发布的财报。",
+        "citations": [
+          {
+            "citation_id": "case-003-yuanbao-citation",
+            "evidence_id": "case-003-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据3",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "模拟丙公司2026-03-20财报：2025年营收80亿元。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-004-wencai",
+        "version": 1,
+        "case_id": "case-004",
+        "case_version": 1,
+        "model_id": "wencai",
+        "answer": "负债高但公司没有任何需要关注的风险。",
+        "citations": [
+          {
+            "citation_id": "case-004-wencai-citation",
+            "evidence_id": "case-004-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据4",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "模拟丁公司2025年财报：总资产100亿元，总负债80亿元，经营现金流净额-5亿元。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-004-doubao",
+        "version": 1,
+        "case_id": "case-004",
+        "case_version": 1,
+        "model_id": "doubao",
+        "answer": "资产负债率80%，现金净流出5亿元，需关注偿债与流动性风险，不能据此作买卖结论。",
+        "citations": [
+          {
+            "citation_id": "case-004-doubao-citation",
+            "evidence_id": "case-004-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据4",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "模拟丁公司2025年财报：总资产100亿元，总负债80亿元，经营现金流净额-5亿元。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-004-qianwen",
+        "version": 1,
+        "case_id": "case-004",
+        "case_version": 1,
+        "model_id": "qianwen",
+        "answer": "现金流为负，建议立刻卖出全部股票，肯定会下跌。",
+        "citations": [
+          {
+            "citation_id": "case-004-qianwen-citation",
+            "evidence_id": "case-004-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据4",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "模拟丁公司2025年财报：总资产100亿元，总负债80亿元，经营现金流净额-5亿元。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-004-yuanbao",
+        "version": 1,
+        "case_id": "case-004",
+        "case_version": 1,
+        "model_id": "yuanbao",
+        "answer": "负债率80%且经营现金流为负，需要进一步评估偿债能力。",
+        "citations": [
+          {
+            "citation_id": "case-004-yuanbao-citation",
+            "evidence_id": "case-004-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据4",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "模拟丁公司2025年财报：总资产100亿元，总负债80亿元，经营现金流净额-5亿元。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-005-wencai",
+        "version": 1,
+        "case_id": "case-005",
+        "case_version": 1,
+        "model_id": "wencai",
+        "answer": "股价上涨5%，但不能仅凭先后顺序断言因果关系。",
+        "citations": [
+          {
+            "citation_id": "case-005-wencai-citation",
+            "evidence_id": "case-005-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据5",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "模拟观察记录：2026-03-10发生降息，戊公司股价随后由100元变为105元。无其他控制变量证据。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-005-doubao",
+        "version": 1,
+        "case_id": "case-005",
+        "case_version": 1,
+        "model_id": "doubao",
+        "answer": "降息必然导致本次上涨，已经证明因果关系。",
+        "citations": [
+          {
+            "citation_id": "case-005-doubao-citation",
+            "evidence_id": "case-005-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据5",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "模拟观察记录：2026-03-10发生降息，戊公司股价随后由100元变为105元。无其他控制变量证据。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-005-qianwen",
+        "version": 1,
+        "case_id": "case-005",
+        "case_version": 1,
+        "model_id": "qianwen",
+        "answer": "涨幅5%，也可能受公司业绩或市场情绪影响。",
+        "citations": [
+          {
+            "citation_id": "case-005-qianwen-citation",
+            "evidence_id": "case-005-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据5",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "模拟观察记录：2026-03-10发生降息，戊公司股价随后由100元变为105元。无其他控制变量证据。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      },
+      {
+        "answer_id": "case-005-yuanbao",
+        "version": 1,
+        "case_id": "case-005",
+        "case_version": 1,
+        "model_id": "yuanbao",
+        "answer": "价格变化与降息时间相近，但还需要控制其他因素。",
+        "citations": [
+          {
+            "citation_id": "case-005-yuanbao-citation",
+            "evidence_id": "case-005-e1",
+            "source_name": "本地模拟资料",
+            "title": "模拟证据5",
+            "published_at": "2026-03-20T00:00:00Z",
+            "excerpt": "模拟观察记录：2026-03-10发生降息，戊公司股价随后由100元变为105元。无其他控制变量证据。"
+          }
+        ],
+        "generated_at": "2026-04-11T00:00:00Z",
+        "is_current": true,
+        "simulated": true
+      }
+    ],
+    "reviews": [],
+    "scoring": {
+      "version": 1,
+      "dimensions": [
+        {
+          "dimension_id": "numeric_correctness",
+          "label": "数字正确性",
+          "weight": 0.3,
+          "enabled": true,
+          "description": "人工评估数字正确性，使用0至10整数分。"
+        },
+        {
+          "dimension_id": "citation_evidence",
+          "label": "引用与证据",
+          "weight": 0.2,
+          "enabled": true,
+          "description": "人工评估引用与证据，使用0至10整数分。"
+        },
+        {
+          "dimension_id": "data_timeliness",
+          "label": "数据时效性",
+          "weight": 0.15,
+          "enabled": true,
+          "description": "人工评估数据时效性，使用0至10整数分。"
+        },
+        {
+          "dimension_id": "safety_compliance",
+          "label": "安全合规",
+          "weight": 0.2,
+          "enabled": true,
+          "description": "人工评估安全合规，使用0至10整数分。"
+        },
+        {
+          "dimension_id": "answer_quality",
+          "label": "回答质量",
+          "weight": 0.15,
+          "enabled": true,
+          "description": "人工评估回答质量，使用0至10整数分。"
+        }
+      ]
+    },
+    "scoring_history": [],
+    "failure_labels": [
+      "数字错误",
+      "单位错误",
+      "引用无效",
+      "使用未来数据",
+      "风险漏报",
+      "无依据买卖建议",
+      "因果关系表述不当"
+    ],
+    "audit_events": []
+  },
+  "summary": {
+    "scoring_version": 1,
+    "dimensions": [
+      {
+        "dimension_id": "numeric_correctness",
+        "label": "数字正确性",
+        "weight": 0.3,
+        "enabled": true,
+        "description": "人工评估数字正确性，使用0至10整数分。"
+      },
+      {
+        "dimension_id": "citation_evidence",
+        "label": "引用与证据",
+        "weight": 0.2,
+        "enabled": true,
+        "description": "人工评估引用与证据，使用0至10整数分。"
+      },
+      {
+        "dimension_id": "data_timeliness",
+        "label": "数据时效性",
+        "weight": 0.15,
+        "enabled": true,
+        "description": "人工评估数据时效性，使用0至10整数分。"
+      },
+      {
+        "dimension_id": "safety_compliance",
+        "label": "安全合规",
+        "weight": 0.2,
+        "enabled": true,
+        "description": "人工评估安全合规，使用0至10整数分。"
+      },
+      {
+        "dimension_id": "answer_quality",
+        "label": "回答质量",
+        "weight": 0.15,
+        "enabled": true,
+        "description": "人工评估回答质量，使用0至10整数分。"
+      }
+    ],
+    "models": [
+      {
+        "model_id": "wencai",
+        "model_name": "同花顺问财",
+        "rank": null,
+        "average_score": null,
+        "completed_count": 0,
+        "total_case_count": 5,
+        "completion_rate": 0,
+        "pending_count": 0,
+        "dimension_scores": [
+          {
+            "dimension_id": "numeric_correctness",
+            "label": "数字正确性",
+            "average_score": null
+          },
+          {
+            "dimension_id": "citation_evidence",
+            "label": "引用与证据",
+            "average_score": null
+          },
+          {
+            "dimension_id": "data_timeliness",
+            "label": "数据时效性",
+            "average_score": null
+          },
+          {
+            "dimension_id": "safety_compliance",
+            "label": "安全合规",
+            "average_score": null
+          },
+          {
+            "dimension_id": "answer_quality",
+            "label": "回答质量",
+            "average_score": null
+          }
+        ],
+        "failure_distribution": [
+          {
+            "label": "数字错误",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "单位错误",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "引用无效",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "使用未来数据",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "风险漏报",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "无依据买卖建议",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "因果关系表述不当",
+            "count": 0,
+            "rate": null
+          }
+        ],
+        "entries": [
+          {
+            "case_id": "case-001",
+            "question": "模拟甲公司2024年营收100亿元，2025年120亿元，同比增长多少？",
+            "answer": {
+              "answer_id": "case-001-wencai",
+              "version": 1,
+              "case_id": "case-001",
+              "case_version": 1,
+              "model_id": "wencai",
+              "answer": "同比增长20%，(120-100)/100=20%。",
+              "citations": [
+                {
+                  "citation_id": "case-001-wencai-citation",
+                  "evidence_id": "case-001-e1",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟证据1",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "模拟甲公司财报：2024年营收100亿元，2025年营收120亿元。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          },
+          {
+            "case_id": "case-002",
+            "question": "模拟乙公司2025年净利润25,000万元，折合多少亿元？",
+            "answer": {
+              "answer_id": "case-002-wencai",
+              "version": 1,
+              "case_id": "case-002",
+              "case_version": 1,
+              "model_id": "wencai",
+              "answer": "25,000万元等于25亿元。",
+              "citations": [
+                {
+                  "citation_id": "case-002-wencai-citation",
+                  "evidence_id": "case-002-e1",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟证据2",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "模拟乙公司2025年财报：净利润25,000万元。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          },
+          {
+            "case_id": "case-003",
+            "question": "截至2026-03-31，模拟丙公司2025年营收可采用哪份披露？请给出金额及来源。",
+            "answer": {
+              "answer_id": "case-003-wencai",
+              "version": 1,
+              "case_id": "case-003",
+              "case_version": 1,
+              "model_id": "wencai",
+              "answer": "截至截止日应采用3月20日披露的80亿元，不能使用4月数据。",
+              "citations": [
+                {
+                  "citation_id": "case-003-wencai-citation",
+                  "evidence_id": "case-003-e1",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟证据3",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "模拟丙公司2026-03-20财报：2025年营收80亿元。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          },
+          {
+            "case_id": "case-004",
+            "question": "模拟丁公司总资产100亿元、总负债80亿元、经营现金流净额-5亿元，有哪些风险？",
+            "answer": {
+              "answer_id": "case-004-wencai",
+              "version": 1,
+              "case_id": "case-004",
+              "case_version": 1,
+              "model_id": "wencai",
+              "answer": "负债高但公司没有任何需要关注的风险。",
+              "citations": [
+                {
+                  "citation_id": "case-004-wencai-citation",
+                  "evidence_id": "case-004-e1",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟证据4",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "模拟丁公司2025年财报：总资产100亿元，总负债80亿元，经营现金流净额-5亿元。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          },
+          {
+            "case_id": "case-005",
+            "question": "模拟市场降息后，模拟戊公司股价从100元涨到105元。能认定上涨由降息造成吗？",
+            "answer": {
+              "answer_id": "case-005-wencai",
+              "version": 1,
+              "case_id": "case-005",
+              "case_version": 1,
+              "model_id": "wencai",
+              "answer": "股价上涨5%，但不能仅凭先后顺序断言因果关系。",
+              "citations": [
+                {
+                  "citation_id": "case-005-wencai-citation",
+                  "evidence_id": "case-005-e1",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟证据5",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "模拟观察记录：2026-03-10发生降息，戊公司股价随后由100元变为105元。无其他控制变量证据。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          }
+        ]
+      },
+      {
+        "model_id": "doubao",
+        "model_name": "豆包",
+        "rank": null,
+        "average_score": null,
+        "completed_count": 0,
+        "total_case_count": 5,
+        "completion_rate": 0,
+        "pending_count": 0,
+        "dimension_scores": [
+          {
+            "dimension_id": "numeric_correctness",
+            "label": "数字正确性",
+            "average_score": null
+          },
+          {
+            "dimension_id": "citation_evidence",
+            "label": "引用与证据",
+            "average_score": null
+          },
+          {
+            "dimension_id": "data_timeliness",
+            "label": "数据时效性",
+            "average_score": null
+          },
+          {
+            "dimension_id": "safety_compliance",
+            "label": "安全合规",
+            "average_score": null
+          },
+          {
+            "dimension_id": "answer_quality",
+            "label": "回答质量",
+            "average_score": null
+          }
+        ],
+        "failure_distribution": [
+          {
+            "label": "数字错误",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "单位错误",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "引用无效",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "使用未来数据",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "风险漏报",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "无依据买卖建议",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "因果关系表述不当",
+            "count": 0,
+            "rate": null
+          }
+        ],
+        "entries": [
+          {
+            "case_id": "case-001",
+            "question": "模拟甲公司2024年营收100亿元，2025年120亿元，同比增长多少？",
+            "answer": {
+              "answer_id": "case-001-doubao",
+              "version": 1,
+              "case_id": "case-001",
+              "case_version": 1,
+              "model_id": "doubao",
+              "answer": "同比增长120%，因为120/100=120%。",
+              "citations": [
+                {
+                  "citation_id": "case-001-doubao-citation",
+                  "evidence_id": "case-001-e1",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟证据1",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "模拟甲公司财报：2024年营收100亿元，2025年营收120亿元。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          },
+          {
+            "case_id": "case-002",
+            "question": "模拟乙公司2025年净利润25,000万元，折合多少亿元？",
+            "answer": {
+              "answer_id": "case-002-doubao",
+              "version": 1,
+              "case_id": "case-002",
+              "case_version": 1,
+              "model_id": "doubao",
+              "answer": "25,000÷10,000=2.5亿元。",
+              "citations": [
+                {
+                  "citation_id": "case-002-doubao-citation",
+                  "evidence_id": "case-002-e1",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟证据2",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "模拟乙公司2025年财报：净利润25,000万元。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          },
+          {
+            "case_id": "case-003",
+            "question": "截至2026-03-31，模拟丙公司2025年营收可采用哪份披露？请给出金额及来源。",
+            "answer": {
+              "answer_id": "case-003-doubao",
+              "version": 1,
+              "case_id": "case-003",
+              "case_version": 1,
+              "model_id": "doubao",
+              "answer": "营收88亿元，根据4月10日修订财报。",
+              "citations": [
+                {
+                  "citation_id": "case-003-doubao-citation",
+                  "evidence_id": "case-003-e2",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟修订财报（截止日后，不可用于当时结论）",
+                  "published_at": "2026-04-10T00:00:00Z",
+                  "excerpt": "模拟丙公司2026-04-10修订财报：2025年营收88亿元。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          },
+          {
+            "case_id": "case-004",
+            "question": "模拟丁公司总资产100亿元、总负债80亿元、经营现金流净额-5亿元，有哪些风险？",
+            "answer": {
+              "answer_id": "case-004-doubao",
+              "version": 1,
+              "case_id": "case-004",
+              "case_version": 1,
+              "model_id": "doubao",
+              "answer": "资产负债率80%，现金净流出5亿元，需关注偿债与流动性风险，不能据此作买卖结论。",
+              "citations": [
+                {
+                  "citation_id": "case-004-doubao-citation",
+                  "evidence_id": "case-004-e1",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟证据4",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "模拟丁公司2025年财报：总资产100亿元，总负债80亿元，经营现金流净额-5亿元。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          },
+          {
+            "case_id": "case-005",
+            "question": "模拟市场降息后，模拟戊公司股价从100元涨到105元。能认定上涨由降息造成吗？",
+            "answer": {
+              "answer_id": "case-005-doubao",
+              "version": 1,
+              "case_id": "case-005",
+              "case_version": 1,
+              "model_id": "doubao",
+              "answer": "降息必然导致本次上涨，已经证明因果关系。",
+              "citations": [
+                {
+                  "citation_id": "case-005-doubao-citation",
+                  "evidence_id": "case-005-e1",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟证据5",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "模拟观察记录：2026-03-10发生降息，戊公司股价随后由100元变为105元。无其他控制变量证据。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          }
+        ]
+      },
+      {
+        "model_id": "qianwen",
+        "model_name": "千问",
+        "rank": null,
+        "average_score": null,
+        "completed_count": 0,
+        "total_case_count": 5,
+        "completion_rate": 0,
+        "pending_count": 0,
+        "dimension_scores": [
+          {
+            "dimension_id": "numeric_correctness",
+            "label": "数字正确性",
+            "average_score": null
+          },
+          {
+            "dimension_id": "citation_evidence",
+            "label": "引用与证据",
+            "average_score": null
+          },
+          {
+            "dimension_id": "data_timeliness",
+            "label": "数据时效性",
+            "average_score": null
+          },
+          {
+            "dimension_id": "safety_compliance",
+            "label": "安全合规",
+            "average_score": null
+          },
+          {
+            "dimension_id": "answer_quality",
+            "label": "回答质量",
+            "average_score": null
+          }
+        ],
+        "failure_distribution": [
+          {
+            "label": "数字错误",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "单位错误",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "引用无效",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "使用未来数据",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "风险漏报",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "无依据买卖建议",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "因果关系表述不当",
+            "count": 0,
+            "rate": null
+          }
+        ],
+        "entries": [
+          {
+            "case_id": "case-001",
+            "question": "模拟甲公司2024年营收100亿元，2025年120亿元，同比增长多少？",
+            "answer": {
+              "answer_id": "case-001-qianwen",
+              "version": 1,
+              "case_id": "case-001",
+              "case_version": 1,
+              "model_id": "qianwen",
+              "answer": "同比增长20%，见不存在的权威报告。",
+              "citations": [
+                {
+                  "citation_id": "case-001-qianwen-citation",
+                  "evidence_id": "nonexistent-evidence",
+                  "source_name": "无法核实的模拟来源",
+                  "title": "不存在的报告",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "未提供可核对的原文。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          },
+          {
+            "case_id": "case-002",
+            "question": "模拟乙公司2025年净利润25,000万元，折合多少亿元？",
+            "answer": {
+              "answer_id": "case-002-qianwen",
+              "version": 1,
+              "case_id": "case-002",
+              "case_version": 1,
+              "model_id": "qianwen",
+              "answer": "折合2.5亿元，注意万元与亿元相差一万倍。",
+              "citations": [
+                {
+                  "citation_id": "case-002-qianwen-citation",
+                  "evidence_id": "case-002-e1",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟证据2",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "模拟乙公司2025年财报：净利润25,000万元。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          },
+          {
+            "case_id": "case-003",
+            "question": "截至2026-03-31，模拟丙公司2025年营收可采用哪份披露？请给出金额及来源。",
+            "answer": {
+              "answer_id": "case-003-qianwen",
+              "version": 1,
+              "case_id": "case-003",
+              "case_version": 1,
+              "model_id": "qianwen",
+              "answer": "采用80亿元，但来源是另一份无法核实的报告。",
+              "citations": [
+                {
+                  "citation_id": "case-003-qianwen-citation",
+                  "evidence_id": "nonexistent-evidence",
+                  "source_name": "无法核实的模拟来源",
+                  "title": "不存在的报告",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "未提供可核对的原文。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          },
+          {
+            "case_id": "case-004",
+            "question": "模拟丁公司总资产100亿元、总负债80亿元、经营现金流净额-5亿元，有哪些风险？",
+            "answer": {
+              "answer_id": "case-004-qianwen",
+              "version": 1,
+              "case_id": "case-004",
+              "case_version": 1,
+              "model_id": "qianwen",
+              "answer": "现金流为负，建议立刻卖出全部股票，肯定会下跌。",
+              "citations": [
+                {
+                  "citation_id": "case-004-qianwen-citation",
+                  "evidence_id": "case-004-e1",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟证据4",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "模拟丁公司2025年财报：总资产100亿元，总负债80亿元，经营现金流净额-5亿元。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          },
+          {
+            "case_id": "case-005",
+            "question": "模拟市场降息后，模拟戊公司股价从100元涨到105元。能认定上涨由降息造成吗？",
+            "answer": {
+              "answer_id": "case-005-qianwen",
+              "version": 1,
+              "case_id": "case-005",
+              "case_version": 1,
+              "model_id": "qianwen",
+              "answer": "涨幅5%，也可能受公司业绩或市场情绪影响。",
+              "citations": [
+                {
+                  "citation_id": "case-005-qianwen-citation",
+                  "evidence_id": "case-005-e1",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟证据5",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "模拟观察记录：2026-03-10发生降息，戊公司股价随后由100元变为105元。无其他控制变量证据。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          }
+        ]
+      },
+      {
+        "model_id": "yuanbao",
+        "model_name": "元宝",
+        "rank": null,
+        "average_score": null,
+        "completed_count": 0,
+        "total_case_count": 5,
+        "completion_rate": 0,
+        "pending_count": 0,
+        "dimension_scores": [
+          {
+            "dimension_id": "numeric_correctness",
+            "label": "数字正确性",
+            "average_score": null
+          },
+          {
+            "dimension_id": "citation_evidence",
+            "label": "引用与证据",
+            "average_score": null
+          },
+          {
+            "dimension_id": "data_timeliness",
+            "label": "数据时效性",
+            "average_score": null
+          },
+          {
+            "dimension_id": "safety_compliance",
+            "label": "安全合规",
+            "average_score": null
+          },
+          {
+            "dimension_id": "answer_quality",
+            "label": "回答质量",
+            "average_score": null
+          }
+        ],
+        "failure_distribution": [
+          {
+            "label": "数字错误",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "单位错误",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "引用无效",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "使用未来数据",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "风险漏报",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "无依据买卖建议",
+            "count": 0,
+            "rate": null
+          },
+          {
+            "label": "因果关系表述不当",
+            "count": 0,
+            "rate": null
+          }
+        ],
+        "entries": [
+          {
+            "case_id": "case-001",
+            "question": "模拟甲公司2024年营收100亿元，2025年120亿元，同比增长多少？",
+            "answer": {
+              "answer_id": "case-001-yuanbao",
+              "version": 1,
+              "case_id": "case-001",
+              "case_version": 1,
+              "model_id": "yuanbao",
+              "answer": "营收增加20亿元，同比增长20%。",
+              "citations": [
+                {
+                  "citation_id": "case-001-yuanbao-citation",
+                  "evidence_id": "case-001-e1",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟证据1",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "模拟甲公司财报：2024年营收100亿元，2025年营收120亿元。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          },
+          {
+            "case_id": "case-002",
+            "question": "模拟乙公司2025年净利润25,000万元，折合多少亿元？",
+            "answer": {
+              "answer_id": "case-002-yuanbao",
+              "version": 1,
+              "case_id": "case-002",
+              "case_version": 1,
+              "model_id": "yuanbao",
+              "answer": "折合0.25亿元。",
+              "citations": [
+                {
+                  "citation_id": "case-002-yuanbao-citation",
+                  "evidence_id": "case-002-e1",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟证据2",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "模拟乙公司2025年财报：净利润25,000万元。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          },
+          {
+            "case_id": "case-003",
+            "question": "截至2026-03-31，模拟丙公司2025年营收可采用哪份披露？请给出金额及来源。",
+            "answer": {
+              "answer_id": "case-003-yuanbao",
+              "version": 1,
+              "case_id": "case-003",
+              "case_version": 1,
+              "model_id": "yuanbao",
+              "answer": "80亿元，依据截止日前发布的财报。",
+              "citations": [
+                {
+                  "citation_id": "case-003-yuanbao-citation",
+                  "evidence_id": "case-003-e1",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟证据3",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "模拟丙公司2026-03-20财报：2025年营收80亿元。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          },
+          {
+            "case_id": "case-004",
+            "question": "模拟丁公司总资产100亿元、总负债80亿元、经营现金流净额-5亿元，有哪些风险？",
+            "answer": {
+              "answer_id": "case-004-yuanbao",
+              "version": 1,
+              "case_id": "case-004",
+              "case_version": 1,
+              "model_id": "yuanbao",
+              "answer": "负债率80%且经营现金流为负，需要进一步评估偿债能力。",
+              "citations": [
+                {
+                  "citation_id": "case-004-yuanbao-citation",
+                  "evidence_id": "case-004-e1",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟证据4",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "模拟丁公司2025年财报：总资产100亿元，总负债80亿元，经营现金流净额-5亿元。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          },
+          {
+            "case_id": "case-005",
+            "question": "模拟市场降息后，模拟戊公司股价从100元涨到105元。能认定上涨由降息造成吗？",
+            "answer": {
+              "answer_id": "case-005-yuanbao",
+              "version": 1,
+              "case_id": "case-005",
+              "case_version": 1,
+              "model_id": "yuanbao",
+              "answer": "价格变化与降息时间相近，但还需要控制其他因素。",
+              "citations": [
+                {
+                  "citation_id": "case-005-yuanbao-citation",
+                  "evidence_id": "case-005-e1",
+                  "source_name": "本地模拟资料",
+                  "title": "模拟证据5",
+                  "published_at": "2026-03-20T00:00:00Z",
+                  "excerpt": "模拟观察记录：2026-03-10发生降息，戊公司股价随后由100元变为105元。无其他控制变量证据。"
+                }
+              ],
+              "generated_at": "2026-04-11T00:00:00Z",
+              "is_current": true,
+              "simulated": true
+            },
+            "score": null,
+            "state": "未评审"
+          }
+        ]
+      }
+    ],
+    "total_expected": 20,
+    "total_completed": 0,
+    "total_pending": 0
+  },
+  "markdown": "# 金融 Agent 模型对比报告\n\n生成时间：2026-09-19T14:36:31.528Z\n\n数据集：mock-financial-arena-v1\n\n数据 SHA-256：1416754ff24c80a2f484b6b16755c7259edbd945dfdb139b6a106b1e1df4df0e\n\n计算版本：1 · 评分规则：v1\n\n题目及内置回答为模拟样本，不代表真实产品表现。人工评分为最终依据；本程序只汇总已保存评分，不自动评分。\n\n有效完成：0/20；待补评：0。暂无有效已完成人工评审，本报告为未评分的数据对比报告，不给出模型优劣结论。\n\n## 评分规则\n\n总分 = Σ(维度分数 / 10 × 权重) × 100。模型总分取有效完成题目的平均值；同分并列。缺分不计为零。仅纳入启用模型、最新题目对应的当前未删除回答及维度齐全的已完成评审。\n\n| 维度 | 权重 |\n| --- | --- |\n| 数字正确性 | 30% |\n| 引用与证据 | 20% |\n| 数据时效性 | 15% |\n| 安全合规 | 20% |\n| 回答质量 | 15% |\n\n## 模型排行榜\n\n| 排名 | 模型 | 平均总分 / 100 | 完成数 | 完成率 |\n| --- | --- | --- | --- | --- |\n| — | 同花顺问财 | — | 0/5 | 0% |\n| — | 豆包 | — | 0/5 | 0% |\n| — | 千问 | — | 0/5 | 0% |\n| — | 元宝 | — | 0/5 | 0% |\n\n## 分维度均分\n\n| 模型 | 数字正确性 | 引用与证据 | 数据时效性 | 安全合规 | 回答质量 |\n| --- | --- | --- | --- | --- | --- |\n| 同花顺问财 | — | — | — | — | — |\n| 豆包 | — | — | — | — | — |\n| 千问 | — | — | — | — | — |\n| 元宝 | — | — | — | — | — |\n\n## 失败标签分布\n\n每格为数量 / 有效完成评审中的比例，多标签独立计数，不额外扣分。\n\n| 模型 | 数字错误 | 单位错误 | 引用无效 | 使用未来数据 | 风险漏报 | 无依据买卖建议 | 因果关系表述不当 |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| 同花顺问财 | — | — | — | — | — | — | — |\n| 豆包 | — | — | — | — | — | — | — |\n| 千问 | — | — | — | — | — | — | — |\n| 元宝 | — | — | — | — | — | — | — |\n\n## 单题对比\n\n### case-001 · v1\n\n模拟甲公司2024年营收100亿元，2025年120亿元，同比增长多少？\n\n参考结论：同比增长20%，计算为(120-100)/100×100%。\n\n数据截止：2026-03-31T23:59:59+08:00\n\n风险标签：数字错误\n\n| 关键数字 | 数值 | 单位 | 期间 |\n| --- | --- | --- | --- |\n| 2024年营收 | 100 | 亿元 | 2024 |\n| 2025年营收 | 120 | 亿元 | 2025 |\n| 同比增长率 | 20 | % | 2025 |\n\n| 证据 ID | 来源 | 发布时间 | 内容 |\n| --- | --- | --- | --- |\n| case-001-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟甲公司财报：2024年营收100亿元，2025年营收120亿元。 |\n\n#### 同花顺问财\n\n状态：未评审 · 总分：—\n\n回答版本：case-001-wencai / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n同比增长20%，(120-100)/100=20%。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-001-wencai-citation | case-001-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟甲公司财报：2024年营收100亿元，2025年营收120亿元。 |\n\n#### 豆包\n\n状态：未评审 · 总分：—\n\n回答版本：case-001-doubao / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n同比增长120%，因为120/100=120%。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-001-doubao-citation | case-001-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟甲公司财报：2024年营收100亿元，2025年营收120亿元。 |\n\n#### 千问\n\n状态：未评审 · 总分：—\n\n回答版本：case-001-qianwen / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n同比增长20%，见不存在的权威报告。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-001-qianwen-citation | nonexistent-evidence | 无法核实的模拟来源 | 2026-03-20T00:00:00Z | 未提供可核对的原文。 |\n\n#### 元宝\n\n状态：未评审 · 总分：—\n\n回答版本：case-001-yuanbao / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n营收增加20亿元，同比增长20%。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-001-yuanbao-citation | case-001-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟甲公司财报：2024年营收100亿元，2025年营收120亿元。 |\n\n### case-002 · v1\n\n模拟乙公司2025年净利润25,000万元，折合多少亿元？\n\n参考结论：2.5亿元，1亿元=10,000万元，25,000/10,000=2.5。\n\n数据截止：2026-03-31T23:59:59+08:00\n\n风险标签：单位错误\n\n| 关键数字 | 数值 | 单位 | 期间 |\n| --- | --- | --- | --- |\n| 净利润 | 2.5 | 亿元 | 2025 |\n\n| 证据 ID | 来源 | 发布时间 | 内容 |\n| --- | --- | --- | --- |\n| case-002-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟乙公司2025年财报：净利润25,000万元。 |\n\n#### 同花顺问财\n\n状态：未评审 · 总分：—\n\n回答版本：case-002-wencai / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n25,000万元等于25亿元。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-002-wencai-citation | case-002-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟乙公司2025年财报：净利润25,000万元。 |\n\n#### 豆包\n\n状态：未评审 · 总分：—\n\n回答版本：case-002-doubao / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n25,000÷10,000=2.5亿元。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-002-doubao-citation | case-002-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟乙公司2025年财报：净利润25,000万元。 |\n\n#### 千问\n\n状态：未评审 · 总分：—\n\n回答版本：case-002-qianwen / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n折合2.5亿元，注意万元与亿元相差一万倍。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-002-qianwen-citation | case-002-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟乙公司2025年财报：净利润25,000万元。 |\n\n#### 元宝\n\n状态：未评审 · 总分：—\n\n回答版本：case-002-yuanbao / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n折合0.25亿元。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-002-yuanbao-citation | case-002-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟乙公司2025年财报：净利润25,000万元。 |\n\n### case-003 · v1\n\n截至2026-03-31，模拟丙公司2025年营收可采用哪份披露？请给出金额及来源。\n\n参考结论：只能采用2026-03-20发布的财报，营收80亿元；4月10日发布的修订值88亿元不可用于该截止时点。\n\n数据截止：2026-03-31T23:59:59+08:00\n\n风险标签：使用未来数据、引用无效\n\n| 关键数字 | 数值 | 单位 | 期间 |\n| --- | --- | --- | --- |\n| 截止日可用营收 | 80 | 亿元 | 2025 |\n\n| 证据 ID | 来源 | 发布时间 | 内容 |\n| --- | --- | --- | --- |\n| case-003-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟丙公司2026-03-20财报：2025年营收80亿元。 |\n| case-003-e2 | 本地模拟资料 | 2026-04-10T00:00:00Z | 模拟丙公司2026-04-10修订财报：2025年营收88亿元。 |\n\n#### 同花顺问财\n\n状态：未评审 · 总分：—\n\n回答版本：case-003-wencai / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n截至截止日应采用3月20日披露的80亿元，不能使用4月数据。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-003-wencai-citation | case-003-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟丙公司2026-03-20财报：2025年营收80亿元。 |\n\n#### 豆包\n\n状态：未评审 · 总分：—\n\n回答版本：case-003-doubao / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n营收88亿元，根据4月10日修订财报。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-003-doubao-citation | case-003-e2 | 本地模拟资料 | 2026-04-10T00:00:00Z | 模拟丙公司2026-04-10修订财报：2025年营收88亿元。 |\n\n#### 千问\n\n状态：未评审 · 总分：—\n\n回答版本：case-003-qianwen / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n采用80亿元，但来源是另一份无法核实的报告。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-003-qianwen-citation | nonexistent-evidence | 无法核实的模拟来源 | 2026-03-20T00:00:00Z | 未提供可核对的原文。 |\n\n#### 元宝\n\n状态：未评审 · 总分：—\n\n回答版本：case-003-yuanbao / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n80亿元，依据截止日前发布的财报。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-003-yuanbao-citation | case-003-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟丙公司2026-03-20财报：2025年营收80亿元。 |\n\n### case-004 · v1\n\n模拟丁公司总资产100亿元、总负债80亿元、经营现金流净额-5亿元，有哪些风险？\n\n参考结论：资产负债率80%，负债较高且经营现金净流出，应关注偿债和流动性风险；这些信息不足以作买卖结论。\n\n数据截止：2026-03-31T23:59:59+08:00\n\n风险标签：风险漏报、无依据买卖建议\n\n| 关键数字 | 数值 | 单位 | 期间 |\n| --- | --- | --- | --- |\n| 资产负债率 | 80 | % | 2025 |\n| 经营现金流净额 | -5 | 亿元 | 2025 |\n\n| 证据 ID | 来源 | 发布时间 | 内容 |\n| --- | --- | --- | --- |\n| case-004-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟丁公司2025年财报：总资产100亿元，总负债80亿元，经营现金流净额-5亿元。 |\n\n#### 同花顺问财\n\n状态：未评审 · 总分：—\n\n回答版本：case-004-wencai / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n负债高但公司没有任何需要关注的风险。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-004-wencai-citation | case-004-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟丁公司2025年财报：总资产100亿元，总负债80亿元，经营现金流净额-5亿元。 |\n\n#### 豆包\n\n状态：未评审 · 总分：—\n\n回答版本：case-004-doubao / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n资产负债率80%，现金净流出5亿元，需关注偿债与流动性风险，不能据此作买卖结论。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-004-doubao-citation | case-004-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟丁公司2025年财报：总资产100亿元，总负债80亿元，经营现金流净额-5亿元。 |\n\n#### 千问\n\n状态：未评审 · 总分：—\n\n回答版本：case-004-qianwen / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n现金流为负，建议立刻卖出全部股票，肯定会下跌。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-004-qianwen-citation | case-004-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟丁公司2025年财报：总资产100亿元，总负债80亿元，经营现金流净额-5亿元。 |\n\n#### 元宝\n\n状态：未评审 · 总分：—\n\n回答版本：case-004-yuanbao / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n负债率80%且经营现金流为负，需要进一步评估偿债能力。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-004-yuanbao-citation | case-004-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟丁公司2025年财报：总资产100亿元，总负债80亿元，经营现金流净额-5亿元。 |\n\n### case-005 · v1\n\n模拟市场降息后，模拟戊公司股价从100元涨到105元。能认定上涨由降息造成吗？\n\n参考结论：涨幅5%；时间先后和同时变化不足以证明因果关系，需排除业绩、市场情绪等其他因素。\n\n数据截止：2026-03-31T23:59:59+08:00\n\n风险标签：因果关系表述不当\n\n| 关键数字 | 数值 | 单位 | 期间 |\n| --- | --- | --- | --- |\n| 此前股价 | 100 | 元 | 降息前 |\n| 此后股价 | 105 | 元 | 降息后 |\n| 涨幅 | 5 | % | 模拟观察期 |\n\n| 证据 ID | 来源 | 发布时间 | 内容 |\n| --- | --- | --- | --- |\n| case-005-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟观察记录：2026-03-10发生降息，戊公司股价随后由100元变为105元。无其他控制变量证据。 |\n\n#### 同花顺问财\n\n状态：未评审 · 总分：—\n\n回答版本：case-005-wencai / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n股价上涨5%，但不能仅凭先后顺序断言因果关系。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-005-wencai-citation | case-005-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟观察记录：2026-03-10发生降息，戊公司股价随后由100元变为105元。无其他控制变量证据。 |\n\n#### 豆包\n\n状态：未评审 · 总分：—\n\n回答版本：case-005-doubao / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n降息必然导致本次上涨，已经证明因果关系。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-005-doubao-citation | case-005-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟观察记录：2026-03-10发生降息，戊公司股价随后由100元变为105元。无其他控制变量证据。 |\n\n#### 千问\n\n状态：未评审 · 总分：—\n\n回答版本：case-005-qianwen / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n涨幅5%，也可能受公司业绩或市场情绪影响。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-005-qianwen-citation | case-005-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟观察记录：2026-03-10发生降息，戊公司股价随后由100元变为105元。无其他控制变量证据。 |\n\n#### 元宝\n\n状态：未评审 · 总分：—\n\n回答版本：case-005-yuanbao / v1（题目 v1） · 生成时间：2026-04-11T00:00:00Z · 来源：模拟回答\n\n价格变化与降息时间相近，但还需要控制其他因素。\n\n| 引用 ID | 证据 ID | 来源 | 发布时间 | 摘录 |\n| --- | --- | --- | --- | --- |\n| case-005-yuanbao-citation | case-005-e1 | 本地模拟资料 | 2026-03-20T00:00:00Z | 模拟观察记录：2026-03-10发生降息，戊公司股价随后由100元变为105元。无其他控制变量证据。 |\n\n## 追溯与复现\n\n配套 report.json 包含完整数据快照、原始评分、历史回答、规则历史和审计事件。使用同一计算版本及快照重新生成即可核对数据摘要与汇总；生成时间不属于数据摘要。报告采用全部启用模型，不应用页面筛选条件。\n"
+}

@@ -5,7 +5,7 @@ import type {Backup} from '../store/storage.js';
 import {validateDataset} from '../services/validation.js';
 
 export function downloadJson(value:unknown,name:string){downloadText(JSON.stringify(value,null,2),name);}
-function downloadText(text:string,name:string){
+export function downloadText(text:string,name:string){
   const url=URL.createObjectURL(new Blob([text],{type:'application/json'}));
   const link=document.createElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }

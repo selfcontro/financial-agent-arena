@@ -29,6 +29,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "start": "tsx server/index.ts"
+    "start": "tsx server/index.ts",
+    "report": "tsx scripts/report.ts"
   }
 }

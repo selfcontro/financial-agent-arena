@@ -2,12 +2,13 @@ import { useState } from 'react';
 import type { EvaluationDataset, ScoringDimension } from '../types/evaluation.js';
 import { aggregateDataset, roundScore } from '../services/aggregation.js';
 import { createSeedDataset } from '../data/seed.js';
+import { ReportDownload } from './ReportDownload.js';
 import { Modal } from './Modal.js';
 
 export function SummaryReport({data,openCase,saveRules,readOnly}:{data:EvaluationDataset;openCase:(id:string)=>void;saveRules:(d:ScoringDimension[])=>void;readOnly:boolean}) {
   const report=aggregateDataset(data);const [settings,setSettings]=useState(false);
   return <section aria-label="评测汇总" className="summary-page">
-    <div className="page-heading"><div><div className="eyebrow">SCORES & INSIGHTS</div><h1>评测汇总</h1><p>统计当前回答版本，只纳入已完成且维度齐全的人工评审。</p></div><button onClick={()=>setSettings(true)} disabled={readOnly}>评分规则与权重</button></div>
+    <div className="page-heading"><div><div className="eyebrow">SCORES & INSIGHTS</div><h1>评测汇总</h1><p>统计当前回答版本，只纳入已完成且维度齐全的人工评审。</p></div><div className="settings-tools"><ReportDownload data={data}/><button onClick={()=>setSettings(true)} disabled={readOnly}>评分规则与权重</button></div></div>
     <div className="summary-metrics"><article><small>当前规则已完成</small><strong>{report.total_completed} <em>/ {report.total_expected}</em></strong></article><article><small>待补评</small><strong>{report.total_pending}</strong></article><article><small>评分规则版本</small><strong>v{report.scoring_version}</strong></article></div>
     <section className="report-panel"><h2>正式排行榜</h2><p className="hint">模型总分为已完成题目的平均分，满分 100。不同模型可能覆盖不同题目，请结合完成率解读；未完成题目不按 0 分处理。</p>
       {!report.total_completed&&<p className="empty-report">暂无正式排名。请先完成至少一条当前回答的人工评审。</p>}
