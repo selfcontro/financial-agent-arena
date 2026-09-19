@@ -64,7 +64,7 @@
           "simulated": true
         }
       ],
-      "cutoff_at": "2026-03-31T23:59:59Z",
+      "cutoff_at": "2026-03-31T23:59:59+08:00",
       "risk_labels": [
         "数字错误"
       ],
@@ -94,7 +94,7 @@
           "simulated": true
         }
       ],
-      "cutoff_at": "2026-03-31T23:59:59Z",
+      "cutoff_at": "2026-03-31T23:59:59+08:00",
       "risk_labels": [
         "单位错误"
       ],
@@ -132,7 +132,7 @@
           "simulated": true
         }
       ],
-      "cutoff_at": "2026-03-31T23:59:59Z",
+      "cutoff_at": "2026-03-31T23:59:59+08:00",
       "risk_labels": [
         "使用未来数据",
         "引用无效"
@@ -170,7 +170,7 @@
           "simulated": true
         }
       ],
-      "cutoff_at": "2026-03-31T23:59:59Z",
+      "cutoff_at": "2026-03-31T23:59:59+08:00",
       "risk_labels": [
         "风险漏报",
         "无依据买卖建议"
@@ -215,7 +215,7 @@
           "simulated": true
         }
       ],
-      "cutoff_at": "2026-03-31T23:59:59Z",
+      "cutoff_at": "2026-03-31T23:59:59+08:00",
       "risk_labels": [
         "因果关系表述不当"
       ],

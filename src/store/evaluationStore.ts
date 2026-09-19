@@ -1,4 +1,4 @@
-import type { EvaluationDataset, ReviewRecord, ModelAnswer } from '../types/evaluation.js';
+import type { EvaluationDataset, ReviewRecord, ModelAnswer, Model } from '../types/evaluation.js';
 import { validateDataset } from '../services/validation.js';
 import { Repository } from './storage.js';
 
@@ -15,6 +15,29 @@ export class EvaluationStore {
   }
   getState() {return structuredClone(this.state);}
   subscribe(listener:()=>void) {this.listeners.add(listener);return ()=>{this.listeners.delete(listener);};}
+  addModel(input:Omit<Model,'model_id'|'enabled'>) {
+    this.ensureIdle(); const next=this.getState();
+    const model:Model={...structuredClone(input),model_id:this.id(),enabled:true};
+    next.models.push(model);next.audit_events.push(this.event('model',model.model_id,'create',undefined,model));this.commit(next);
+    return model.model_id;
+  }
+  addAnswer(caseId:string,modelId:string,edit:AnswerEdit) {
+    this.ensureIdle(); const next=this.getState();
+    if(!next.models.some(m=>m.model_id===modelId&&m.enabled)) throw new Error('模型不存在或已停用');
+    const question=next.cases.filter(c=>c.case_id===caseId).sort((a,b)=>b.version-a.version)[0];
+    if(!question) throw new Error('题目不存在');
+    if(next.answers.some(a=>a.case_id===caseId&&a.model_id===modelId&&a.is_current&&!a.deleted_at)) throw new Error('该模型已有当前回答，请编辑原回答');
+    const previous=next.answers.filter(a=>a.case_id===caseId&&a.model_id===modelId).sort((a,b)=>b.version-a.version)[0];
+    const answer:ModelAnswer={...structuredClone(edit),answer_id:previous?.answer_id??this.id(),version:previous?previous.version+1:1,case_id:caseId,case_version:question.version,model_id:modelId,is_current:true,simulated:true};
+    next.answers.push(answer);next.audit_events.push(this.event('answer',answer.answer_id,'create',undefined,answer));this.commit(next);
+  }
+  deleteAnswer(answerId:string) {
+    this.ensureIdle(); const next=this.getState();
+    const answer=next.answers.find(a=>a.answer_id===answerId&&a.is_current&&!a.deleted_at);
+    if(!answer) throw new Error('当前回答不存在');
+    const before=structuredClone(answer);answer.is_current=false;answer.deleted_at=this.now();
+    next.audit_events.push(this.event('answer',answerId,'delete',before,answer));this.commit(next);
+  }
   private ensureIdle() {if(this.busy) throw new Error('备份或恢复操作进行中');}
   private event(type:Event['entity_type'], entityId:string, action:Event['action'], before:unknown, after:unknown):Event {
     return {event_id:this.id(),entity_type:type,entity_id:entityId,action,occurred_at:this.now(),before:structuredClone(before),after:structuredClone(after)};

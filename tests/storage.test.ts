@@ -19,6 +19,32 @@ function review(s:EvaluationStore) {
 }
 
 describe('local persistence and audit history',()=>{
+  it('adds a model and answer, persists both and rejects duplicate answers',()=>{
+    const disk=new MemoryStorage(),s=store(disk);
+    const modelId=s.addModel({display_name:'新增模型'});
+    const input={answer:'模拟回答',citations:[],generated_at:'2026-09-19T12:00:00Z'};
+    s.addAnswer('case-001',modelId,input);
+    expect(store(disk).getState().models).toHaveLength(5);
+    expect(store(disk).getState().answers).toHaveLength(21);
+    expect(()=>s.addAnswer('case-001',modelId,input)).toThrow('已有当前回答');
+    expect(s.getState().answers).toHaveLength(21);
+  });
+  it('soft deletes answers without deleting reviews and re-adds a new version',()=>{
+    const disk=new MemoryStorage(),s=store(disk);s.saveReview(review(s));
+    const old=s.getState().answers[0];s.deleteAnswer(old.answer_id);
+    expect(store(disk).getState().answers[0]).toMatchObject({is_current:false,deleted_at:'2026-09-19T12:00:00Z'});
+    expect(s.getState().reviews[0].answer_version).toBe(1);
+    s.addAnswer(old.case_id,old.model_id,{answer:'重新添加',citations:[],generated_at:old.generated_at});
+    const current=s.getState().answers.find(a=>a.answer_id===old.answer_id&&a.is_current)!;
+    expect(current.version).toBe(2);expect(current.deleted_at).toBeUndefined();
+    expect(s.getState().reviews.some(r=>r.answer_version===2)).toBe(false);
+  });
+  it('rolls back soft deletion and model addition when persistence fails',()=>{
+    const disk=new MemoryStorage(),s=store(disk);s.saveReview(review(s));const before=s.getState();disk.failPrefix=CURRENT_KEY;
+    expect(()=>s.deleteAnswer(before.answers[0].answer_id)).toThrow('quota');
+    expect(()=>s.addModel({display_name:'失败模型'})).toThrow('quota');
+    expect(s.getState()).toEqual(before);expect(store(disk).getState()).toEqual(before);
+  });
   it('persists partial reviews without treating missing scores as zero',()=>{
     const disk=new MemoryStorage(),s=store(disk);
     const draft={...review(s),status:'in_progress' as const,dimension_scores:[{dimension_id:'numeric_correctness',score:0}]};
