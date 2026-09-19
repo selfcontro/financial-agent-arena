@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { EvaluationDataset, EvaluationCase, ModelAnswer, ReviewRecord, ScoringDimension } from '../types/evaluation.js';
+import { weightedScore, roundScore } from '../services/aggregation.js';
 import { Modal } from './Modal.js';
 import { draftScores,reviewReadiness } from '../services/review.js';
 import type { ReviewDraft } from '../services/review.js';
@@ -10,7 +11,8 @@ const names={unreviewed:'未评审',in_progress:'评审中',completed:'已完成
 export function ReviewSummary({review,dimensions}:{review?:ReviewRecord;dimensions:ScoringDimension[]}) {
   if(!review)return null;
   const readiness=reviewReadiness(review,dimensions);
-  return <section className="review-summary" aria-label="已保存评审"><h4>人工评审 · {readiness.label}</h4>
+  const total=weightedScore(review,dimensions);
+  return <section className="review-summary" aria-label="已保存评审"><h4>人工评审 · {readiness.label}</h4><p className="review-total">{total===null?'暂无正式分数':`${roundScore(total).toFixed(2)} / 100`}</p>
     <dl>{dimensions.filter(d=>d.enabled).map(d=><div key={d.dimension_id}><dt>{d.label}</dt><dd>{review.dimension_scores.find(s=>s.dimension_id===d.dimension_id)?.score??'—'} / 10</dd></div>)}</dl>
     {!!readiness.missing.length&&review.status==='completed'&&<p className="warning">当前规则新增维度，待补评：{readiness.missing.map(d=>d.label).join('、')}</p>}
     <div className="tags">{review.failure_labels.map(l=><span key={l}>{l}</span>)}</div>{review.comment&&<p className="review-comment">{review.comment}</p>}<small>最近保存 · {time(review.updated_at)}</small>

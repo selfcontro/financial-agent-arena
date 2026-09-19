@@ -3,6 +3,7 @@ import { EvaluationStore } from './store/evaluationStore.js';
 import { Repository } from './store/storage.js';
 import { Modal } from './components/Modal.js';
 import { ReviewForm, ReviewSummary } from './components/ReviewForm.js';
+import { SummaryReport } from './components/SummaryReport.js';
 import { reviewReadiness } from './services/review.js';
 import { modelApi } from './services/modelApi.js';
 import type { EvaluationCase, ModelAnswer, Model } from './types/evaluation.js';
@@ -16,6 +17,7 @@ export function App() {
   const [data,setData]=useState(()=>store.getState());
   const [selected,setSelected]=useState(data.cases[0].case_id);
   const [notice,setNotice]=useState('');
+  const [view,setView]=useState<'cases'|'summary'>('cases');
   const [editor,setEditor]=useState<{modelId:string;answer?:ModelAnswer}|null>(null);
   const [deleting,setDeleting]=useState<ModelAnswer|null>(null);
   const [history,setHistory]=useState<string|null>(null);
@@ -31,12 +33,13 @@ export function App() {
   function act(action:()=>void,success:string) {try {action();setNotice(success);} catch(e){setNotice(`操作失败：${String(e)}`);}}
   return <div className="layout">
     <aside className="sidebar"><a className="brand" href="#"><span className="brand-icon">评</span><span>金融 Agent<span className="brand-sub">EVALUATION ARENA</span></span></a>
+      <button className={`case-nav ${view==='summary'?'selected':''}`} onClick={()=>setView('summary')}>▥ 评测汇总与排行榜</button>
       <div className="section-label">评测工作台 <span>{cases.length.toString().padStart(2,'0')}</span></div>
-      <nav aria-label="评测题目">{cases.map((c,i)=><button key={c.case_id} className={`case-nav ${c.case_id===question.case_id?'selected':''}`} onClick={()=>{setSelected(c.case_id);setNotice('');}} aria-current={c.case_id===question.case_id?'page':undefined}><span className="case-number">{String(i+1).padStart(2,'0')}</span><span><strong>{headings[i]??c.case_id}</strong><small>{c.case_id}</small></span></button>)}</nav>
+      <nav aria-label="评测题目">{cases.map((c,i)=><button key={c.case_id} className={`case-nav ${view==='cases'&&c.case_id===question.case_id?'selected':''}`} onClick={()=>{setSelected(c.case_id);setView('cases');setNotice('');}} aria-current={view==='cases'&&c.case_id===question.case_id?'page':undefined}><span className="case-number">{String(i+1).padStart(2,'0')}</span><span><strong>{headings[i]??c.case_id}</strong><small>{c.case_id}</small></span></button>)}</nav>
       <div className="sidebar-note"><span className="dot"/> 本地模拟数据集<p>内置回答为模拟样本，<br/>API 生成回答单独标识。</p></div>
     </aside>
-    <main><header className="topbar"><span>工作台 <span className="slash">/</span> 单题对比</span><span className="local-badge">本地保存 · 可选 API 调用</span></header>
-      <div className="workspace"><div className="page-heading"><div><div className="eyebrow">COMPARE & REVIEW</div><h1>让每个回答，都有据可查。</h1><p>对照参考证据，比较不同模型在同一问题上的回答。</p></div><button className="primary" onClick={()=>setAddingModel(true)} disabled={!!store.warning}>＋ 添加模型</button></div>
+    <main><header className="topbar"><span>工作台 <span className="slash">/</span> {view==='summary'?'评测汇总':'单题对比'}</span><span className="local-badge">本地保存 · 可选 API 调用</span></header>
+      <div className="workspace">{view==='summary'?<SummaryReport data={data} readOnly={!!store.warning} openCase={id=>{setSelected(id);setView('cases');}} saveRules={dims=>store.updateScoring(dims)}/>:<><div className="page-heading"><div><div className="eyebrow">COMPARE & REVIEW</div><h1>让每个回答，都有据可查。</h1><p>对照参考证据，比较不同模型在同一问题上的回答。</p></div><button className="primary" onClick={()=>setAddingModel(true)} disabled={!!store.warning}>＋ 添加模型</button></div>
       {store.warning&&<p role="alert" className="warning">{store.warning}</p>}{notice&&<p role="status" className={notice.startsWith('操作失败')?'warning':'notice'}>{notice}</p>}
       <section className="question-panel"><div className="question-meta"><span className="pill">评测题 {question.case_id}</span><span>截止时间 · {stamp(question.cutoff_at)}（北京时间）</span></div><h2>{question.question}</h2><div className="tags">{question.risk_labels.map(l=><span key={l}>{l}</span>)}</div>
         <details><summary>参考答案与证据 <span>展开核对 ↓</span></summary><p className="reference-answer">{question.reference_answer}</p><div className="reference-values">{question.reference_values.map(v=><div key={v.key}><small>{v.label}</small><strong>{v.value} <em>{v.unit}</em></strong><small>{v.period}</small></div>)}</div>
@@ -51,7 +54,7 @@ export function App() {
           <div className="connection-actions"><button onClick={()=>setConfigModel(model)} disabled={!!store.warning}>API 配置</button><button onClick={()=>setGenerating(model)} disabled={!!store.warning}>生成回答</button><small>{model.model_name??'未配置接口模型'}</small></div>
           {answer?<><p className="answer-text">{answer.answer}</p><div className="citation-list"><h4>引用与来源 <span>{answer.citations.length}</span></h4>{!answer.citations.length&&<p className="warning">未提供引用，请人工核查。</p>}{answer.citations.map(c=><div className="citation" key={c.citation_id}><strong>{c.title}</strong><small>{c.source_name} · {stamp(c.published_at)}</small><p>{c.excerpt}</p>{!question.allowed_evidence.some(e=>e.evidence_id===c.evidence_id)&&<p className="warning">未匹配到本题证据，请人工核查。</p>}{Date.parse(c.published_at)>Date.parse(question.cutoff_at)&&<p className="warning">引用晚于数据截止时间。</p>}{Date.parse(c.published_at)>Date.parse(answer.generated_at)&&<p className="warning">引用发布时间晚于回答生成时间。</p>}</div>)}</div><ReviewSummary review={review||undefined} dimensions={data.scoring.dimensions}/><div className="review-entry"><button className="primary" disabled={!!store.warning} onClick={()=>setReviewing(answer)}>{review?'编辑评审':'开始评审'}</button></div><div className="card-bottom"><small>生成于 {stamp(answer.generated_at)}</small><div className="card-actions"><button onClick={()=>setEditor({modelId:model.model_id,answer})} disabled={!!store.warning}>编辑回答</button><button onClick={()=>setHistory(model.model_id)}>历史</button><button className="danger" onClick={()=>setDeleting(answer)} disabled={!!store.warning}>删除</button></div></div></>:<div className="empty"><span>＋</span><h3>该模型暂无回答</h3><p>添加模拟回答后即可参与对比。</p><button onClick={()=>setEditor({modelId:model.model_id})} disabled={!!store.warning}>添加回答</button>{historical&&<button onClick={()=>setHistory(model.model_id)}>查看历史</button>}</div>}
         </article>;
-      })}</div><footer>人工评分为最终依据 <span>共 {data.models.length} 个模型 · {data.audit_events.length} 条审计事件</span></footer></div>
+      })}</div><footer>人工评分为最终依据 <span>共 {data.models.length} 个模型 · {data.audit_events.length} 条审计事件</span></footer></>}</div>
     </main>
     {reviewing&&<ReviewForm answer={reviewing} modelName={models.find(m=>m.model_id===reviewing.model_id)!.display_name} question={question} dimensions={data.scoring.dimensions} labels={data.failure_labels} review={data.reviews.find(r=>r.answer_id===reviewing.answer_id&&r.answer_version===reviewing.version&&!r.deleted_at)} events={data.audit_events} close={()=>setReviewing(null)} save={draft=>{store.saveReview(draft);setReviewing(null);setNotice('评审已保存');}}/>}
     {editor&&<AnswerEditor question={question} modelName={models.find(m=>m.model_id===editor.modelId)!.display_name} answer={editor.answer} close={()=>setEditor(null)} save={edit=>{if(editor.answer)store.editAnswer(editor.answer.answer_id,edit);else store.addAnswer(question.case_id,editor.modelId,edit);setEditor(null);setNotice('回答已保存');}}/>}
