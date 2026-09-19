@@ -425,26 +425,33 @@ financial-agent-arena:v1
 报告生成脚本读取同一份 JSON 快照，生成：
 
 ```text
-reports/model-comparison-report.json
-reports/model-comparison-report.md
+reports/<生成时间>-<报告ID>/snapshot.json
+reports/<生成时间>-<报告ID>/report.json
+reports/<生成时间>-<报告ID>/report.md
 ```
 
-这样可以证明报告来自可追溯的数据，而不是手工填写。
+每次生成报告先固定输入快照，页面和命令行使用同一统计模块；报告包含快照内容摘要、计算规则版本、评分维度与权重。再次生成创建新目录，不覆盖旧报告。相同快照和规则重新生成的分数、排名和标签统计必须一致，生成时间可以不同。
+
+报告至少包含四个默认模型的排名、分维度平均分、失败标签数量和比例、完成率、单题对比及未完成数据说明。模型和维度动态生成。最终报告基于实际人工评审记录；预置演示评分必须明确标为演示，不冒充人工评分。为形成完整可比的提交报告，计划由人工完成默认四模型在同一组至少五道题上的评审。
 
 ### 5.3 提交物保存
 
-提交前固定保存以下内容：
+以项目仓库为唯一源码来源，打包时保留根目录结构，不另维护一套 source 副本。提交前固定保存以下内容：
 
 ```text
-submission/
-├── source/                       # 完整源码
-├── data/                        # 内置模拟数据和最终导出 JSON
-├── reports/                     # 程序生成的对比报告
-├── tests/                       # 至少 3 个测试及运行结果
+financial-agent-arena/
+├── src/                         # 完整源码，含 data/ 内置模拟数据
+├── scripts/                     # 报告生成和打包脚本
+├── reports/                     # 每次报告及对应 snapshot.json
+├── backups/archive.json         # 多次备份归档
+├── tests/                       # 测试源码
 ├── docs/
-│   ├── agent-conversation-log.md # Codex/Claude Code 对话记录
-│   ├── scoring-rules.md          # 评分权重和标签说明
-│   └── test-result.txt           # 测试命令和输出
+│   ├── conversations/           # 开发全过程的实际 Agent 对话导出
+│   ├── scoring-rules.md         # 评分维度、权重和失败标签定义
+│   └── validation.txt           # 实际测试及构建命令、时间和输出
+├── package.json
+├── package-lock.json
+├── 配套构建与类型配置文件
 ├── GOAL.md
 ├── PLAN.md
 └── README.md
@@ -456,7 +463,24 @@ submission/
 financial-agent-arena-submission.zip
 ```
 
-压缩包内不放 `node_modules/`，但必须保留 `package-lock.json`，确保评审人执行 `npm ci` 后能复现环境。运行产生的最终 JSON 快照、报告、测试输出和对话记录必须纳入压缩包。
+压缩包排除 `node_modules/`、`.git/` 和密钥，保留锁文件及全部运行必需文件。解压后验证 `npm ci`、测试、构建、本地启动及报告复算。运行不依赖真实模型接口或外部证据下载；安装依赖所需网络在 README 说明。
+
+Agent 对话记录保存实际导出内容，覆盖规划与实现过程；摘要只能作为补充，不替代原始对话。导出中如含密钥需脱敏并注明。无法取得原始记录时明确列为未完成项，不生成虚构对话。
+
+#### GOAL.md 提交要求对应表
+
+| 提交要求 | 对应交付物与验收方式 |
+|---|---|
+| 使用 Agent 工具 | `docs/conversations/` 保存实际 Codex 等工具对话记录 |
+| 可运行的本地竞技场及完整源码 | `src/`、依赖锁文件和配置；解压后按 README 成功启动 |
+| 开发过程中与 Agent 的对话 | 包含当前规划讨论及后续实现、调试记录，不只提交总结 |
+| 内置模拟题、四模型回答及证据 | `src/data/` 至少 5 道题、问财及其他三模型每题各一条回答，至少 20 条；包含 GOAL.md 规定的字段和本地证据内容 |
+| 维度、权重及失败标签说明 | `docs/scoring-rules.md`；默认包含要求的五维度和七类失败标签，说明总分、缺失数据和版本处理 |
+| 程序生成的四模型对比报告 | `reports/<生成时间>-<报告ID>/` 中的 Markdown、JSON 及输入快照；README 给出可执行复算命令 |
+| 至少 3 个测试 | `tests/` 覆盖保存及刷新恢复、修改不重复、汇总统计；`docs/validation.txt` 保存真实通过结果 |
+| README | 说明启动方式、数据结构、评分规则、已知限制，并链接报告、对话、备份和验证证据 |
+
+以上是交付验收计划，不代表功能或测试已完成；实际交付时逐项验证并记录结果。
 
 ## 6. 测试计划
 
