@@ -1,18 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
-import type { ReactNode } from 'react';
 import { EvaluationStore } from './store/evaluationStore.js';
 import { Repository } from './store/storage.js';
+import { Modal } from './components/Modal.js';
+import { ReviewForm, ReviewSummary } from './components/ReviewForm.js';
+import { reviewReadiness } from './services/review.js';
 import { modelApi } from './services/modelApi.js';
 import type { EvaluationCase, ModelAnswer, Model } from './types/evaluation.js';
 
 const headings=['营收同比','单位换算','数据时效','风险识别','因果判断'];
 const statusNames={unreviewed:'未评审',in_progress:'评审中',completed:'已完成'};
 const stamp=(s:string)=>new Date(s).toLocaleString('zh-CN',{hour12:false,timeZone:'Asia/Shanghai'});
-function Modal({title,close,children}:{title:string;close:()=>void;children:ReactNode}) {
-  const dialog=useRef<HTMLDialogElement>(null);
-  useEffect(()=>{dialog.current?.showModal();},[]);
-  return <dialog ref={dialog} onCancel={e=>{e.preventDefault();close();}} aria-label={title}><div className="modal-head"><h2>{title}</h2><button onClick={close} aria-label="关闭弹窗">×</button></div>{children}</dialog>;
-}
 
 export function App() {
   const [store]=useState(()=>new EvaluationStore(new Repository(window.localStorage)));
@@ -22,6 +19,7 @@ export function App() {
   const [editor,setEditor]=useState<{modelId:string;answer?:ModelAnswer}|null>(null);
   const [deleting,setDeleting]=useState<ModelAnswer|null>(null);
   const [history,setHistory]=useState<string|null>(null);
+  const [reviewing,setReviewing]=useState<ModelAnswer|null>(null);
   const [addingModel,setAddingModel]=useState(false);
   const [configModel,setConfigModel]=useState<Model|null>(null);
   const [generating,setGenerating]=useState<Model|null>(null);
@@ -49,12 +47,13 @@ export function App() {
         const answer=activeAnswers.find(a=>a.model_id===model.model_id);
         const review=answer&&data.reviews.find(r=>r.answer_id===answer.answer_id&&r.answer_version===answer.version&&!r.deleted_at);
         const historical=data.answers.some(a=>a.case_id===question.case_id&&a.model_id===model.model_id);
-        return <article className="answer-card" key={model.model_id} aria-label={`${model.display_name}回答`}><div className="card-heading"><div className={`avatar tone-${i%4}`}>{model.display_name.slice(0,1)}</div><div><h3>{model.display_name}</h3><small>{answer?`v${answer.version} · ${answer.simulated?'模拟回答':'API 生成'}`:'等待添加回答'}</small></div><span className="status">{review?statusNames[review.status]:'未评审'}</span></div>
+        return <article className="answer-card" key={model.model_id} aria-label={`${model.display_name}回答`}><div className="card-heading"><div className={`avatar tone-${i%4}`}>{model.display_name.slice(0,1)}</div><div><h3>{model.display_name}</h3><small>{answer?`v${answer.version} · ${answer.simulated?'模拟回答':'API 生成'}`:'等待添加回答'}</small></div><span className="status">{reviewReadiness(review,data.scoring.dimensions).label}</span></div>
           <div className="connection-actions"><button onClick={()=>setConfigModel(model)} disabled={!!store.warning}>API 配置</button><button onClick={()=>setGenerating(model)} disabled={!!store.warning}>生成回答</button><small>{model.model_name??'未配置接口模型'}</small></div>
-          {answer?<><p className="answer-text">{answer.answer}</p><div className="citation-list"><h4>引用与来源 <span>{answer.citations.length}</span></h4>{!answer.citations.length&&<p className="warning">未提供引用，请人工核查。</p>}{answer.citations.map(c=><div className="citation" key={c.citation_id}><strong>{c.title}</strong><small>{c.source_name} · {stamp(c.published_at)}</small><p>{c.excerpt}</p>{!question.allowed_evidence.some(e=>e.evidence_id===c.evidence_id)&&<p className="warning">未匹配到本题证据，请人工核查。</p>}{Date.parse(c.published_at)>Date.parse(question.cutoff_at)&&<p className="warning">引用晚于数据截止时间。</p>}{Date.parse(c.published_at)>Date.parse(answer.generated_at)&&<p className="warning">引用发布时间晚于回答生成时间。</p>}</div>)}</div><div className="card-bottom"><small>生成于 {stamp(answer.generated_at)}</small><div className="card-actions"><button onClick={()=>setEditor({modelId:model.model_id,answer})} disabled={!!store.warning}>编辑回答</button><button onClick={()=>setHistory(model.model_id)}>历史</button><button className="danger" onClick={()=>setDeleting(answer)} disabled={!!store.warning}>删除</button></div></div></>:<div className="empty"><span>＋</span><h3>该模型暂无回答</h3><p>添加模拟回答后即可参与对比。</p><button onClick={()=>setEditor({modelId:model.model_id})} disabled={!!store.warning}>添加回答</button>{historical&&<button onClick={()=>setHistory(model.model_id)}>查看历史</button>}</div>}
+          {answer?<><p className="answer-text">{answer.answer}</p><div className="citation-list"><h4>引用与来源 <span>{answer.citations.length}</span></h4>{!answer.citations.length&&<p className="warning">未提供引用，请人工核查。</p>}{answer.citations.map(c=><div className="citation" key={c.citation_id}><strong>{c.title}</strong><small>{c.source_name} · {stamp(c.published_at)}</small><p>{c.excerpt}</p>{!question.allowed_evidence.some(e=>e.evidence_id===c.evidence_id)&&<p className="warning">未匹配到本题证据，请人工核查。</p>}{Date.parse(c.published_at)>Date.parse(question.cutoff_at)&&<p className="warning">引用晚于数据截止时间。</p>}{Date.parse(c.published_at)>Date.parse(answer.generated_at)&&<p className="warning">引用发布时间晚于回答生成时间。</p>}</div>)}</div><ReviewSummary review={review||undefined} dimensions={data.scoring.dimensions}/><div className="review-entry"><button className="primary" disabled={!!store.warning} onClick={()=>setReviewing(answer)}>{review?'编辑评审':'开始评审'}</button></div><div className="card-bottom"><small>生成于 {stamp(answer.generated_at)}</small><div className="card-actions"><button onClick={()=>setEditor({modelId:model.model_id,answer})} disabled={!!store.warning}>编辑回答</button><button onClick={()=>setHistory(model.model_id)}>历史</button><button className="danger" onClick={()=>setDeleting(answer)} disabled={!!store.warning}>删除</button></div></div></>:<div className="empty"><span>＋</span><h3>该模型暂无回答</h3><p>添加模拟回答后即可参与对比。</p><button onClick={()=>setEditor({modelId:model.model_id})} disabled={!!store.warning}>添加回答</button>{historical&&<button onClick={()=>setHistory(model.model_id)}>查看历史</button>}</div>}
         </article>;
       })}</div><footer>人工评分为最终依据 <span>共 {data.models.length} 个模型 · {data.audit_events.length} 条审计事件</span></footer></div>
     </main>
+    {reviewing&&<ReviewForm answer={reviewing} modelName={models.find(m=>m.model_id===reviewing.model_id)!.display_name} question={question} dimensions={data.scoring.dimensions} labels={data.failure_labels} review={data.reviews.find(r=>r.answer_id===reviewing.answer_id&&r.answer_version===reviewing.version&&!r.deleted_at)} events={data.audit_events} close={()=>setReviewing(null)} save={draft=>{store.saveReview(draft);setReviewing(null);setNotice('评审已保存');}}/>}
     {editor&&<AnswerEditor question={question} modelName={models.find(m=>m.model_id===editor.modelId)!.display_name} answer={editor.answer} close={()=>setEditor(null)} save={edit=>{if(editor.answer)store.editAnswer(editor.answer.answer_id,edit);else store.addAnswer(question.case_id,editor.modelId,edit);setEditor(null);setNotice('回答已保存');}}/>}
     {(addingModel||configModel)&&<ConnectionEditor model={configModel??undefined} close={()=>{setAddingModel(false);setConfigModel(null);}} saveLocal={(input,id)=>{if(id){store.updateModel(id,input);return id;}return store.addModel(input);}} done={()=>{setAddingModel(false);setConfigModel(null);setNotice('模型配置已保存');}}/>}
     {generating&&<GenerateAnswer model={generating} question={question} close={()=>setGenerating(null)} save={result=>{const current=activeAnswers.find(a=>a.model_id===generating.model_id);if(current)store.editAnswer(current.answer_id,result);else store.addAnswer(question.case_id,generating.model_id,result);setGenerating(null);setNotice('API 回答已保存，待人工评审');}}/>}
